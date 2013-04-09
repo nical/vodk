@@ -16,7 +16,7 @@ using namespace vodk::data;
 int main()
 {
     // create the window
-    io::Window window(320, 480, "OpenGL");
+    io::Window window(480, 320, "Vodk");
     gpu::RenderingContext* ctx = window.getRenderingContext();
     gpu::initQuad(ctx);
     data::InitImageAssetManager();
@@ -25,33 +25,23 @@ int main()
 
     ctx->setClearColor(1.0, 0.5, 0.0, 1.0);
 
-    char* src;
-    gpu::Shader fragment_shader;
-    gpu::Shader vertex_shader;
-    gpu::ShaderProgram program;
-    int len1 = loadFile("shaders/basic.vert", src);
-    if (len1 > 0) {
-        gpu::ShaderSource vs(1, &src, &len1);
-        vertex_shader = ctx->createShader(gpu::VERTEX_SHADER);
-        assert(ctx->compileShader(vertex_shader, vs));
-    } else printf("failed to load basic.vert\n");
-    int len2 = loadFile("shaders/textured.frag", src);
-    if (len2 > 0) {
-        gpu::ShaderSource fs(1, &src, &len2);
-        fragment_shader = ctx->createShader(gpu::FRAGMENT_SHADER);
-        assert(ctx->compileShader(fragment_shader, fs));
-    } else printf("failed to load basic.frag\n");
-    if (len1 > 0 && len2 > 0) {
-        program = ctx->createShaderProgram();
-        ctx->attachShader(program, vertex_shader);
-        ctx->attachShader(program, fragment_shader);
-        ctx->bindAttributeLocation(program, 0, "in_Position");
-        ctx->bindAttributeLocation(program, 1, "in_TexCoords");
-        ctx->linkShaderProgram(program);
-    }
+    data::ShaderAsset* vs_asset = new ShaderAsset(ctx, gpu::VERTEX_SHADER,
+                                                  new data::StringAsset("assets/shaders/basic.vert"));
+    data::ShaderAsset* fs_asset = new ShaderAsset(ctx, gpu::FRAGMENT_SHADER,
+                                                  new data::StringAsset("assets/shaders/textured.frag"));
+    data:;ShaderProgramAsset* program_asset = new data::ShaderProgramAsset(ctx, vs_asset, fs_asset);
 
-    ImageAsset img_asset("img/test.png");
+    ImageAsset img_asset("assets/img/test.png");
+
     TextureAsset texture_asset(ctx, &img_asset);
+
+    if (vs_asset->load() && fs_asset->load()) {
+        if (!program_asset->load()) {
+            printf("failed to build the shader program");
+        }
+    } else {
+        printf("failed to compile the shaders");
+    }
 
     if (img_asset.load()) {
         texture_asset.load();
@@ -79,10 +69,11 @@ int main()
 
         ctx->clear(gpu::targetBuffer(gpu::COLOR_BUFFER|gpu::DEPTH_BUFFER));
 
-        ctx->bind(program);
-        ctx->sendUniform(ctx->getUniformLocation(program, "in_Texture"), 0, texture_asset.getTexture());
-        ctx->sendUniform(ctx->getUniformLocation(program, "in_ModelView"), model_view);
-        ctx->sendUniform(ctx->getUniformLocation(program, "in_Transform"), transform);
+        gpu::ShaderProgram p = program_asset->getShaderProgram();
+        ctx->bind(p);
+        ctx->sendUniform(ctx->getUniformLocation(p, "in_Texture"), 0, texture_asset.getTexture());
+        ctx->sendUniform(ctx->getUniformLocation(p, "in_ModelView"), model_view);
+        ctx->sendUniform(ctx->getUniformLocation(p, "in_Transform"), transform);
         gpu::drawUnitQuad(ctx);
 
         window.display();

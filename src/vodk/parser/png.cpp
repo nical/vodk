@@ -132,7 +132,6 @@ bool PNGImage::copyInto(gfx::ImageSurface& surface)
         memcpy(surf_row, _rows[i], _size.width * bpp);
         surf_row += surface.getStride();
     }
-    printf("PNGImage::copyInto %i %i, stride:%i\n", (int)_size.width, (int)_size.height, (int)surface.getStride());
 }
 
 } // parser

@@ -33,11 +33,11 @@ public:
     LinkIterator next() {
         Link** i = _start;
         while (i != _end) {
+            ++i;
             if ((_inIndex < 0 || _inIndex == (*i)->inputPort) &&
                 (_outIndex < 0 || _outIndex == (*i)->outputPort)) {
                 break;
             }
-            ++i;
         }
         return LinkIterator(i, _end, _inIndex, _outIndex);
     }

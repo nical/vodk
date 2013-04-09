@@ -18,6 +18,7 @@ namespace data {
 class Asset;
 
 enum AssetType {
+    STRING_ASSET,
     SHADER_ASSET,
     SHADER_PROGRAM_ASSET,
     FILE_ASSET,
@@ -78,9 +79,9 @@ public:
         return AssetConnectionIterator(outputConnections(), true);
     }
 
-    bool addDependency(Asset* dep) {
+    bool addDependency(Asset* dep, int port = 0) {
         assert(dep);
-        return kiwi::Node::connect(*dep, 0, *this, 0);
+        return kiwi::Node::connect(*dep, 0, *this, port);
     }
 
     virtual AssetType getType() = 0;
@@ -114,6 +115,13 @@ private:
     LoadCallback* _onLoadCB;
     State _state;
 };
+
+template<typename T> 
+T* castAsset(Asset* a) {
+    if (a->getType() == T::Type) return static_cast<T*>(a);
+    return nullptr;
+}
+
 
 } // namespace data
 } // namespace vodk

@@ -5,13 +5,15 @@
 #include <memory.h>
 #include <assert.h>
 
+unsigned int loadFile(const char* path, char *& buffer);
+
 namespace vodk {
 namespace data {
+
 
 static gfx::ImageSurface* sDefaultImage = nullptr;
 
 void InitImageAssetManager() {
-    printf("InitImageAssetManager\n");
     assert(sDefaultImage == nullptr);
     
     sDefaultImage = new gfx::ImageSurface();
@@ -35,7 +37,6 @@ void InitImageAssetManager() {
             }
             pixels[j * 32 * 4 + i * 4 + 3] = 255;
         }
-        printf("\n");
     }
 }
 
@@ -95,6 +96,56 @@ void TextureAsset::unload()
 {
     invalidate();
 }
+
+bool ShaderAsset::load()
+{
+    StringAsset* str_asset = castAsset<StringAsset>(&*dependencies());
+    assert(str_asset);
+
+    char* src;
+    int len = loadFile(str_asset->getString().c_str(), src);
+
+    if (len > 0) {
+        gpu::ShaderSource vs(1, &src, &len);
+        bool result = _ctx->compileShader(_shader, vs);
+
+        delete[] src;
+        return result;
+    } else printf("failed to find file %s\n", str_asset->getString().c_str());
+
+    delete[] src;
+    return false;
+}
+
+void ShaderAsset::unload()
+{
+
+}
+
+bool ShaderProgramAsset::load()
+{
+    AssetConnectionIterator it = dependencies();
+    ShaderAsset* vs_asset = castAsset<ShaderAsset>(&*it);
+    it = it.next();
+    ShaderAsset* fs_asset = castAsset<ShaderAsset>(&*it);
+
+    if (!vs_asset || !fs_asset) return false;
+    if (vs_asset == fs_asset) return false;
+
+    _ctx->attachShader(_program, vs_asset->getShader());
+    _ctx->attachShader(_program, fs_asset->getShader());
+    _ctx->bindAttributeLocation(_program, 0, "in_Position");
+    _ctx->bindAttributeLocation(_program, 1, "in_TexCoords");
+    _ctx->linkShaderProgram(_program);
+
+    return true;
+}
+
+void ShaderProgramAsset::unload()
+{
+
+}
+
 
 } // data
 } // vodk
