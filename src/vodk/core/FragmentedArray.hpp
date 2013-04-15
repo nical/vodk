@@ -4,6 +4,9 @@
 
 #include <stdint.h>
 #include <assert.h>
+#include <stdio.h>
+
+#include "vodk/core/Slice.hpp"
 
 namespace vodk {
 
@@ -40,6 +43,7 @@ public:
     }
 
     void setCapacity(uint32_t newCapacity) const {
+        printf("[warning] Calling unimplemented FragmentedArray<T,N>::setCapacity\n");
         // TODO
     }
 
@@ -57,7 +61,7 @@ public:
         return it->_data[rem];
     }
 
-    void pushBack(const T& value) {
+    T& pushBack(const T& value) {
         Chunk*& c = lastUsedChunk();
         if (!c) {
             c = new Chunk();
@@ -71,6 +75,7 @@ public:
         }
         vc->_data[vc->_size] = value;
         ++vc->_size;
+        return vc->_data[vc->_size];
     }
 
     T popBack() {
@@ -89,6 +94,31 @@ public:
         if (deallocate) {
             _firstChunk = nullptr;
         }
+    }
+
+    class ChunkIterator {
+    public:
+        ChunkIterator(Chunk* c) :_current(c) {}
+        ChunkIterator next() const {
+            return ChunkIterator(_current->_next);
+        }
+        Slice<T> slice() {
+            return Slice<T>(_current->_data, _current->_data + _current->_size);
+        }
+
+        bool hasNext() const {
+            return _current && _current->_next != nullptr;
+        }
+
+        bool isValid() const {
+            return _current;
+        }
+    private:
+        Chunk* _current;
+    };
+
+    ChunkIterator chunks() {
+        return ChunkIterator(_firstChunk);
     }
 
 private:

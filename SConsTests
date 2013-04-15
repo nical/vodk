@@ -1,0 +1,23 @@
+
+Import('build_target')
+Import('widget')
+
+core_tests = ['FragmentedArray']
+parser_tests = ['json']
+
+
+core_src = map(lambda x: 'vodk/core/'+x, core_tests)
+parser_src = map(lambda x: 'vodk/parser/'+x, core_tests)
+
+print core_src
+
+cpp_flags = '-std=c++0x -g'
+
+include_dir = Dir('../../src')
+
+
+env = Environment()
+env.Append(CPPDEFINES='VODK_TEST_MAIN')
+
+env.Program(core_src)
+

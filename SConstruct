@@ -18,3 +18,8 @@ SConscript('SConscript',
             exports={'build_target':'debug',
                      'widget':'Emscripten'})
 
+SConscript('SConsTests',
+            variant_dir='build/tests',
+            duplicate=0,
+            exports={'build_target':'debug',
+                     'widget':'Emscripten'})

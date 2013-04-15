@@ -24,22 +24,6 @@ public:
         return Self(_start+s, _end+e);
     }
 
-    int32_t size() const {
-        return _end - _start;
-    }
-
-    int32_t empty() const {
-        return size() == 0;
-    }
-
-    iterator begin() {
-        return _start;
-    }
-
-    iterator end() {
-        return _end;
-    }
-
     T* pointer() {
         return _start;
     }
@@ -56,16 +40,6 @@ public:
         return _start <= _end && _start != nullptr;
     }
 
-    T& pop_front() {
-        assert(_start < _end);
-        return *_start++;
-    }
-
-    T& pop_back() {
-        assert(_start < _end);
-        return *--_end;
-    }
-
     void shrinkLeft(uint32_t num) {
         _start += num;
         assert (_start <= _end);
@@ -79,6 +53,49 @@ public:
     Slice<uint8_t> bytes() {
         return Slice<uint8_t>(reinterpret_cast<uint8_t*>(_start), (_end - _start) * sizeof(_start) );
     }
+
+    Self next() {
+        Self s = *this;
+        s.shrinkLeft();
+        return s;
+    }
+
+    bool isValid() const {
+        return !empty();
+    }
+
+    bool hasNext() const {
+        return !next().empty();
+    }
+
+    // stl style interface
+
+    int32_t size() const {
+        return _end - _start;
+    }
+
+    int32_t empty() const {
+        return size() == 0;
+    }
+
+    iterator begin() {
+        return _start;
+    }
+
+    iterator end() {
+        return _end;
+    }
+
+    T& pop_front() {
+        assert(_start < _end);
+        return *_start++;
+    }
+
+    T& pop_back() {
+        assert(_start < _end);
+        return *--_end;
+    }
+
 private:
     T* _start;
     T* _end;
