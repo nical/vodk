@@ -3,31 +3,23 @@
 #define VODK_CORE_ENTITY_HPP
 
 #include "stdint.h"
+#include "vodk/core/ObjectID.hpp"
 
-#define DECLARE_COMPONENT_ID(classname) struct classname : public vodk::ComponentID { \
-                                        classname(ComponentID::Handle h = 0, \
-                                                  ComponentID::Handle s = 0) \
-                                        : ComponentID(s,h) {} \
-                                        }; \
+#define DECLARE_ID(classname) struct classname : public vodk::ObjectID { \
+                                  classname(ObjectID::Index i = 0, \
+                                            ObjectID::SubSystem s = 0, \
+                                            ObjectID::GenHash g = 0) \
+                                  : ObjectID(i,s,g) {} \
+                              }; \
 
 namespace vodk {
 
 class Entity;
 
-struct ComponentID {
-    typedef uint16_t Handle;
-
-    ComponentID(Handle s, Handle h)
-    : system(s), handle(h) {}
-
-    Handle system;
-    Handle handle;
-};
-
-DECLARE_COMPONENT_ID(GfxComponentID)
-DECLARE_COMPONENT_ID(PhysicsComponentID)
-DECLARE_COMPONENT_ID(LogicComponentID)
-
+DECLARE_ID(EntityID)
+DECLARE_ID(GfxComponentID)
+DECLARE_ID(PhysicsComponentID)
+DECLARE_ID(LogicComponentID)
 
 class PluginComponent {
 public:
@@ -46,17 +38,6 @@ const EntityState ENTITY_STATE_EMPTY        = 0;
 const EntityState ENTITY_STATE_NORMAL       = 1 << 0;
 const EntityState ENTITY_STATE_DESTROYED    = 1 << 1;
 
-
-struct EntityID {
-    EntityID(uint16_t h, uint8_t gen)
-    : handle(h), generation(gen)
-    {}
-
-    uint16_t handle;
-    uint8_t generation;
-};
-
-
 class Entity {
 public:
     typedef uint64_t Family;
@@ -68,7 +49,7 @@ public:
     LogicComponentID    logicID;
     Family              family;
     EntityState         state;
-    uint8_t             generation;
+    ObjectID::GenHash   genHash;
 };
 
 } // vodk

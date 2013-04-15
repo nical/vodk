@@ -11,13 +11,13 @@ EntityID EntityManager::addEntity()
         for (uint32_t i = 0; i < elts.size(); ++i) {
             if (elts[i].state & ENTITY_STATE_EMPTY) {
                 elts[i].reset(ENTITY_STATE_NORMAL);
-                return EntityID(i, _generation++);
+                return EntityID(i, _genHash++);
             }
         }
         it = it.next();
     }
     _entities.pushBack(Entity()).reset(ENTITY_STATE_NORMAL);
-    return EntityID(_entities.getSize() - 1, _generation++);
+    return EntityID(_entities.getSize() - 1, _genHash++);
 }
 
 const Entity* EntityManager::getEntity(EntityID id)
@@ -28,13 +28,13 @@ const Entity* EntityManager::getEntity(EntityID id)
 
 Entity* EntityManager::_getEntity(EntityID id)
 {
-    if (id.handle >= _entities.getSize()) {
+    if (id.index >= _entities.getSize()) {
         return nullptr;
     }
 
-    Entity* e = &_entities.at(id.handle);
+    Entity* e = &_entities.at(id.index);
 
-    if (e->generation != id.generation) {
+    if (e->genHash != id.genHash) {
         return nullptr;
     }
 

@@ -23,7 +23,7 @@ private:
 
     typedef FragmentedArray<Entity,128> EntityContainer;
     EntityContainer _entities;
-    uint8_t _generation;
+    ObjectID::GenHash _genHash;
     uint32_t _size;
 };
 
