@@ -21,7 +21,9 @@ class StringAsset : public data::Asset
 {
 public:
     static const AssetType Type = STRING_ASSET;
-    StringAsset(const char* url) {
+    StringAsset(AssetManager* mgr, const char* url)
+    : Asset(mgr)
+    {
         _path = url;
         setState(Asset::State::LOADED);
     }
@@ -44,7 +46,7 @@ class ImageAsset : public data::Asset
 {
 public:
     static const AssetType Type = IMAGE_ASSET;
-    ImageAsset(const char* path);
+    ImageAsset(AssetManager* mgr, const char* path);
 
     virtual AssetType getType() override {
         return IMAGE_ASSET;
@@ -65,7 +67,7 @@ class TextureAsset : public data::Asset
 {
 public:
     static const AssetType Type = TEXTURE_ASSET;
-    TextureAsset(gpu::RenderingContext* rc, ImageAsset* dep);
+    TextureAsset(AssetManager* mgr, gpu::RenderingContext* rc, ImageAsset* dep);
 
     virtual AssetType getType() override {
         return TEXTURE_ASSET;
@@ -89,8 +91,8 @@ class ShaderAsset : public data::Asset
 {
 public:
     static const AssetType Type = SHADER_ASSET;
-    ShaderAsset(gpu::RenderingContext* rc, gpu::ShaderType type, StringAsset* dep)
-    : _ctx(rc), _type(type)
+    ShaderAsset(AssetManager* mgr, gpu::RenderingContext* rc, gpu::ShaderType type, StringAsset* dep)
+    : Asset(mgr), _ctx(rc), _type(type)
     {
         if (!addDependency(dep)) { assert(false); }
         _shader = _ctx->createShader(type);
@@ -118,8 +120,8 @@ class ShaderProgramAsset : public data::Asset
 {
 public:
     static const AssetType Type = SHADER_PROGRAM_ASSET;
-    ShaderProgramAsset(gpu::RenderingContext* rc, ShaderAsset* vs, ShaderAsset* fs)
-    : _ctx(rc)
+    ShaderProgramAsset(AssetManager* mgr, gpu::RenderingContext* rc, ShaderAsset* vs, ShaderAsset* fs)
+    : Asset(mgr), _ctx(rc)
     {
         if (!addDependency(vs, 0)) { assert(false); }
         if (!addDependency(fs, 1)) { assert(false); }

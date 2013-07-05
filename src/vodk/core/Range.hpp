@@ -5,15 +5,15 @@
 #include <assert.h>
 
 template<typename T>
-class Slice {
+class Range {
 public:
     typedef T ValueType;
-    typedef Slice<T> Self;
+    typedef Range<T> Self;
     typedef T* iterator;
     typedef const T* const_iterator;
 
-    Slice(T* s, T* e) : _start(s), _end(e) {}
-    Slice(T* aStart, uint32_t aSize) : _start(aStart), _end(aStart+aSize) {}
+    Range(T* s, T* e) : _start(s), _end(e) {}
+    Range(T* aStart, uint32_t aSize) : _start(aStart), _end(aStart+aSize) {}
 
     T& operator[](uint32_t i) {
         assert(i < size());
@@ -28,11 +28,11 @@ public:
         return _start;
     }
 
-    bool operator==(Slice rhs) {
+    bool operator==(Range rhs) {
         return _start == rhs._start && _end == rhs._end;
     }
 
-    bool contains(Slice s) {
+    bool contains(Range s) {
         return _start <= s._start && _end >= s._end;
     }
 
@@ -50,8 +50,8 @@ public:
         assert (_start <= _end);
     }
 
-    Slice<uint8_t> bytes() {
-        return Slice<uint8_t>(reinterpret_cast<uint8_t*>(_start), (_end - _start) * sizeof(_start) );
+    Range<uint8_t> bytes() {
+        return Range<uint8_t>(reinterpret_cast<uint8_t*>(_start), (_end - _start) * sizeof(_start) );
     }
 
     Self next() {
@@ -101,10 +101,10 @@ private:
     T* _end;
 };
 
-template<typename T> Slice<T> slice(T* ptr, uint32_t size) {
-    return Slice<T>(ptr,size);
+template<typename T> Range<T> slice(T* ptr, uint32_t size) {
+    return Range<T>(ptr,size);
 }
 
-typedef Slice<uint8_t> ByteSlice;
+typedef Range<uint8_t> ByteRange;
 
 #endif

@@ -1,4 +1,5 @@
 
+#include "vodk/core/config.hpp"
 #include "vodk/data/Asset.hpp"
 
 namespace vodk {

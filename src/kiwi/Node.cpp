@@ -4,9 +4,12 @@
 
 namespace kiwi {
 
-bool Node::connect(Node& n1, PortIndex p1,
+bool Graph::connect(Node& n1, PortIndex p1,
                    Node& n2, PortIndex p2)
 {
+    if (n1.getGraph() != this || n2.getGraph() != this) {
+        return false;
+    }
     if (areConnected(n1,p1,n2,p2)) {
         return true;
     }
@@ -16,7 +19,7 @@ bool Node::connect(Node& n1, PortIndex p1,
     return true;
 }
 
-bool Node::areConnected(Node& n1, PortIndex p1,
+bool Graph::areConnected(Node& n1, PortIndex p1,
                         Node& n2, PortIndex p2)
 {
     LinkIterator it = n1.outputConnections(p1);
@@ -29,7 +32,7 @@ bool Node::areConnected(Node& n1, PortIndex p1,
     return false;
 }
 
-bool Node::disconnect(const Link* l) 
+bool Graph::disconnect(const Link* l)
 {
     Link* link = const_cast<Link*>(l); 
 

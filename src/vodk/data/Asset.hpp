@@ -28,6 +28,8 @@ enum AssetType {
     SOUND_ASSET,
 };
 
+class AssetManager : public kiwi::Graph { };
+
 struct AssetID {
     const char* _name;
 };
@@ -59,8 +61,9 @@ public:
         INVALID,
     };
 
-    Asset()
-    : _onLoadCB(nullptr), _state(INVALID)
+    Asset(AssetManager* mgr)
+    : kiwi::Node(mgr)
+    , _onLoadCB(nullptr), _state(INVALID)
     {}
 
     virtual ~Asset()
@@ -81,7 +84,7 @@ public:
 
     bool addDependency(Asset* dep, int port = 0) {
         assert(dep);
-        return kiwi::Node::connect(*dep, 0, *this, port);
+        return getGraph()->connect(*dep, 0, *this, port);
     }
 
     virtual AssetType getType() = 0;

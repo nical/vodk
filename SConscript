@@ -5,14 +5,13 @@ print ' -- ' + build_target
 
 cpp_flags = '-std=c++0x -g'
 
-include_dir = Dir('../../src')
+include_dir = [Dir('../../src')]
 libs = ['png']
 
 sfml_libs   = ['sfml-graphics', 'sfml-window', 'sfml-system', 'jpeg']
 gl3_libs    = ['GL', 'GLEW']
 gles2_libs  = ['GLES2']
 sdl_libs    = ['SDL']
-
 
 vodk_src =  Glob('src/vodk/*.cpp') + Glob('src/vodk/*/*.cpp') + Glob('src/kiwi/*.cpp')
 
@@ -25,6 +24,12 @@ if widget == 'SFML':
 if widget == 'SDL' or widget == 'Emscripten':
     env.Append(CPPDEFINES=['VODK_WIDGET_SDL'])
     libs += sdl_libs
+
+if widget == 'Emscripten':
+    env.Replace(CC = "emcc")
+    env.Replace(CXX = "/home/nico/bin/em++")
+    env.Replace(CPPPATH = include_dir + [Dir('/usr/include')])
+
 
 #env.Append(LIBPATH = ['/usr/local/lib/'])
 

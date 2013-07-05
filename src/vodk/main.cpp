@@ -4,6 +4,7 @@
 #include "vodk/gfx/ImageSurface.hpp"
 #include "vodk/gpu/quad.hpp"
 #include "vodk/data/GfxAssets.hpp"
+#include "vodk/logic/AST.hpp"
 
 #include <stdio.h>
 #include <assert.h>
@@ -15,6 +16,7 @@ using namespace vodk::data;
 
 int main()
 {
+    vodk::logic::ast::unittest();
     // create the window
     io::Window window(480, 320, "Vodk");
     gpu::RenderingContext* ctx = window.getRenderingContext();
@@ -25,15 +27,17 @@ int main()
 
     ctx->setClearColor(1.0, 0.5, 0.0, 1.0);
 
-    data::ShaderAsset* vs_asset = new ShaderAsset(ctx, gpu::VERTEX_SHADER,
-                                                  new data::StringAsset("assets/shaders/basic.vert"));
-    data::ShaderAsset* fs_asset = new ShaderAsset(ctx, gpu::FRAGMENT_SHADER,
-                                                  new data::StringAsset("assets/shaders/textured.frag"));
-    data:;ShaderProgramAsset* program_asset = new data::ShaderProgramAsset(ctx, vs_asset, fs_asset);
+    data::AssetManager mgr;
 
-    ImageAsset img_asset("assets/img/test.png");
+    data::ShaderAsset* vs_asset = new ShaderAsset(&mgr, ctx, gpu::VERTEX_SHADER,
+                                                  new data::StringAsset(&mgr, "assets/shaders/basic.vert"));
+    data::ShaderAsset* fs_asset = new ShaderAsset(&mgr, ctx, gpu::FRAGMENT_SHADER,
+                                                  new data::StringAsset(&mgr, "assets/shaders/textured.frag"));
+    data:;ShaderProgramAsset* program_asset = new data::ShaderProgramAsset(&mgr, ctx, vs_asset, fs_asset);
 
-    TextureAsset texture_asset(ctx, &img_asset);
+    ImageAsset img_asset(&mgr, "assets/img/test.png");
+
+    TextureAsset texture_asset(&mgr, ctx, &img_asset);
 
     if (vs_asset->load() && fs_asset->load()) {
         if (!program_asset->load()) {

@@ -17,6 +17,10 @@
 #define VODK_WIDGET_SDL
 #define VODK_GL_ES2
 
+#ifndef CHAR_BIT
+#define CHAR_BIT __CHAR_BIT__
+#endif
+
 #endif // EMSCRIPTEN
 
 

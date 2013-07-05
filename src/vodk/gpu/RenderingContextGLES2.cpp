@@ -36,7 +36,7 @@ public:
     virtual void deleteVertexBuffer(VertexBuffer& vbo) override;
     virtual void bind(const VertexBuffer& vbo) override;
     virtual void unbind(const VertexBuffer& vbo) override;
-    virtual void upload(const VertexBuffer& buf, Slice<byte> data, UploadFlags flags = UPLOAD_DEFAULT);
+    virtual void upload(const VertexBuffer& buf, Range<byte> data, UploadFlags flags = UPLOAD_DEFAULT);
 
     virtual gpu::Texture createTexture(gpu::UpdateHint hint) override;
     virtual void deleteTexture(gpu::Texture tex) override;
@@ -218,7 +218,7 @@ void RenderingContextGLES2::clear(TargetBuffer target)
     CHECK_GL_ERROR
 }
 
-void RenderingContextGLES2::upload(const gpu::VertexBuffer& vbo, Slice<byte> data, UploadFlags flags)
+void RenderingContextGLES2::upload(const gpu::VertexBuffer& vbo, Range<byte> data, UploadFlags flags)
 {
   glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(byte), data.pointer(), toGL(vbo.update));
   CHECK_GL_ERROR

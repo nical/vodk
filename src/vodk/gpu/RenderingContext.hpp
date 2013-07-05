@@ -3,7 +3,7 @@
 #define VODK_GPU_RENDERINGCONTEXT_HPP
 
 #include "vodk/core/config.hpp"
-#include "vodk/core/Slice.hpp"
+#include "vodk/core/Range.hpp"
 #include <stdint.h>
 #include <glm/glm.hpp>
 
@@ -162,7 +162,7 @@ public:
     virtual void bind(const VertexBuffer& vbo) = 0;
     virtual void unbind(const VertexBuffer& vbo) = 0;
     virtual void upload(const VertexBuffer& buf,
-                        Slice<byte> data,
+                        Range<byte> data,
                         UploadFlags flags = UPLOAD_DEFAULT) = 0;
 
     virtual gpu::Texture createTexture(gpu::UpdateHint hint = gpu::STATIC_UPDATE) = 0;

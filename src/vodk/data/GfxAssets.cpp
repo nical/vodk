@@ -1,4 +1,5 @@
 
+#include "vodk/core/config.hpp"
 #include "GfxAssets.hpp"
 #include "vodk/gfx/ImageSurface.hpp"
 #include "vodk/parser/png.hpp"
@@ -66,15 +67,15 @@ void ImageAsset::unload()
     invalidate();
 }
 
-ImageAsset::ImageAsset(const char* path) 
-: _path(path), _img(sDefaultImage)
+ImageAsset::ImageAsset(AssetManager* mgr, const char* path)
+: Asset(mgr), _path(path), _img(sDefaultImage)
 {
     assert(sDefaultImage);
     setState(Asset::State::DEFAULT);
 }
 
-TextureAsset::TextureAsset(gpu::RenderingContext* rc, ImageAsset* dep)
-: _ctx(rc)
+TextureAsset::TextureAsset(AssetManager* mgr, gpu::RenderingContext* rc, ImageAsset* dep)
+: Asset(mgr), _ctx(rc)
 {
     if (!addDependency(dep)) { assert(false); }
     _tex = _ctx->createTexture();

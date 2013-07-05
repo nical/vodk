@@ -6,7 +6,7 @@
 #include <assert.h>
 #include <stdio.h>
 
-#include "vodk/core/Slice.hpp"
+#include "vodk/core/Range.hpp"
 
 namespace vodk {
 
@@ -102,8 +102,8 @@ public:
         ChunkIterator next() const {
             return ChunkIterator(_current->_next);
         }
-        Slice<T> slice() {
-            return Slice<T>(_current->_data, _current->_data + _current->_size);
+        Range<T> slice() {
+            return Range<T>(_current->_data, _current->_data + _current->_size);
         }
 
         bool hasNext() const {

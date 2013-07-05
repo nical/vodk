@@ -6,7 +6,7 @@ namespace data {
 
 class AssetManager
 {
-
+public:
 };
 
 } // namespace
