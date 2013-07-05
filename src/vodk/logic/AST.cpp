@@ -1,6 +1,7 @@
 
 #include "vodk/logic/AST.hpp"
 #include "vodk/logic/eval.hpp"
+#include "vodk/logic/BasicNodes.hpp"
 #include <stdio.h>
 
 namespace vodk {
@@ -38,9 +39,14 @@ void ConditionASTNode::dump(uint32_t indent)
 void ActionASTNode::dump(uint32_t indent)
 {
 	dumpIndentation(indent);
-	printf("[action] ");
-	action->dump();
-	printf("\n");
+	printf("[action] %s(", name());
+	for (unsigned i = 0; i < nParams(); ++i) {
+		printf("%c", paramRegister(i)+'A');
+		if (i+1 < nParams()) {
+			printf(", ");
+		}
+	}
+	printf(")\n");
 	if (next) {
 		next->dump(indent);
 	}
@@ -58,12 +64,6 @@ void IteratorASTNode::dump(uint32_t indent)
 	}
 }
 
-void DoNothing::dump()
-{
-	printf("(do nothing)");
-}
-
-
 namespace ast {
 
 ASTNode* ForEach(ASTRegister reg, ASTNode* child)
@@ -78,9 +78,9 @@ ASTNode* If(ConditionASTNode* condition, ASTNode* then, ASTNode* otherwise)
 	return condition;
 }
 
-ASTNode* Then(Action* a)
+ASTNode* Then(ActionASTNode* a)
 {
-	return new ActionASTNode(a);
+	return a;
 }
 
 ASTNode* Not(ConditionASTNode* condition, ASTNode* then)

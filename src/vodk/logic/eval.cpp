@@ -46,7 +46,11 @@ void eval(ASTNode* node, RuntimeContext* ctx)
 		}
 		case AST_ACTION: {
 			ActionASTNode* act = node->AsAction();
-			act->action->run(nullptr);
+			void* params[4];
+			for (unsigned i = 0; i < act->nParams(); ++i) {
+				params[i] = ctx->params[act->paramRegister(i)];
+			}
+			act->run(params);
 			break;
 		}
 		case AST_ITERATE: {
