@@ -1,5 +1,6 @@
 
 #include "vodk/logic/AST.hpp"
+#include "vodk/logic/eval.hpp"
 #include <stdio.h>
 
 namespace vodk {
@@ -13,9 +14,14 @@ void dumpIndentation(uint32_t i)
 void ConditionASTNode::dump(uint32_t indent)
 {
 	dumpIndentation(indent);
-	printf("[if] ");
-	condition->dump();
-	printf("\n");
+	printf("[if] %s(", name());
+	for (unsigned i = 0; i < nParams(); ++i) {
+		printf("%c", paramRegister(i)+'A');
+		if (i+1 < nParams()) {
+			printf(", ");
+		}
+	}
+	printf(")\n");
 	if (then) {
 		then->dump(indent+1);
 	}
@@ -43,18 +49,13 @@ void ActionASTNode::dump(uint32_t indent)
 void IteratorASTNode::dump(uint32_t indent)
 {
 	dumpIndentation(indent);
-	printf("[foreach]\n");
+	printf("[foreach %c]\n", (char)reg+'A');
 	if (child) {
 		child->dump(indent+1);
 	}
 	if (next) {
 		next->dump(indent);
 	}
-}
-
-void AlwaysTrue::dump()
-{
-	printf("(true)");
 }
 
 void DoNothing::dump()
@@ -65,14 +66,16 @@ void DoNothing::dump()
 
 namespace ast {
 
-ASTNode* ForEach(ASTNode* child)
+ASTNode* ForEach(ASTRegister reg, ASTNode* child)
 {
-	return new IteratorASTNode(child, nullptr);
+	return new IteratorASTNode(reg, child, nullptr);
 }
 
-ASTNode* If(Condition* condition, ASTNode* then, ASTNode* otherwise)
+ASTNode* If(ConditionASTNode* condition, ASTNode* then, ASTNode* otherwise)
 {
-	return new ConditionASTNode(condition, then, otherwise);
+	condition->then = then;
+	condition->otherwise = otherwise;
+	return condition;
 }
 
 ASTNode* Then(Action* a)
@@ -80,12 +83,12 @@ ASTNode* Then(Action* a)
 	return new ActionASTNode(a);
 }
 
-ASTNode* Not(Condition* condition, ASTNode* then)
+ASTNode* Not(ConditionASTNode* condition, ASTNode* then)
 {
 	return If(condition, nullptr, then);
 }
 
-ASTNode* And(Condition* a, Condition* b, ASTNode* then)
+ASTNode* And(ConditionASTNode* a, ConditionASTNode* b, ASTNode* then)
 {
 	return If(a,If(b, then));
 }
@@ -102,14 +105,19 @@ const char* nodeTypeStr(ASTNodeType type)
 
 void unittest()
 {
-	ASTNode* n1 = ForEach(
-		If(new AlwaysTrue,
-			Then(new DoNothing)
+	ASTNode* n1 = ForEach( A,
+		If(new Sometimes,
+			ForEach( B,
+				If(new Compare(A, B),
+					Then(new DoNothing)
+				)
+			)
 		,// else
 			Then(new DoNothing)
 		)
 	);
 	n1->dump();
+	eval_test(n1);
 	delete n1;
 }
 

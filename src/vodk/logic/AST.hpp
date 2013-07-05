@@ -2,6 +2,7 @@
 #define VODK_LOGIC_AST_HPP
 
 #include <stdint.h>
+#include <stdio.h>
 
 namespace vodk {
 namespace logic {
@@ -13,21 +14,19 @@ enum ASTNodeType {
 	AST_NONE
 };
 
-class ConditionParam {
+enum ASTRegister { A, B, C, D, X };
+
+class ActionParam {
 
 };
 
-class Condition {
-public:
-	virtual ~Condition() {}
-	virtual bool isSame(Condition* other) = 0;
-	virtual bool evaluate(ConditionParam* params) = 0;
-	virtual void dump() = 0;
-};
-
+/**
+ * TODO - this should inherit from ActionASTNode instead;
+ */
 class Action {
 public:
 	virtual ~Action() {}
+	virtual void run(ActionParam* param) = 0;
 	virtual void dump() = 0;
 };
 
@@ -59,19 +58,17 @@ public:
 class ConditionASTNode : public ASTNode
 {
 public:
-	ConditionASTNode(Condition* cond,
-					 ASTNode* aThen = nullptr,
+	ConditionASTNode(ASTNode* aThen = nullptr,
 					 ASTNode* aElse = nullptr,
 					 ASTNode* aNext = nullptr)
 	: ASTNode(aNext)
-	, condition(cond)
 	, then(aThen)
 	, otherwise(aElse)
-	{}
+	{
+	}
 
 	virtual ~ConditionASTNode()
 	{
-		delete condition;
 		delete then;
 		delete otherwise;
 	}
@@ -81,8 +78,19 @@ public:
 	virtual ConditionASTNode* AsCondition() override { return this; }
 
 	virtual void dump(uint32_t indent = 0) override;
+	virtual const char* name() const = 0;
 
-	Condition* condition;
+	virtual bool evaluate(void* paramas) = 0;
+
+	/**
+	 * number of arguments
+	 */
+	virtual uint8_t nParams() { return 0; }
+	/**
+	 * what register to fetch for a given argument
+	 */
+	virtual ASTRegister paramRegister(uint8_t param) { return X; };
+
 	ASTNode* then;
 	ASTNode* otherwise;
 };
@@ -109,9 +117,10 @@ public:
 class IteratorASTNode : public ASTNode
 {
 public:
-	IteratorASTNode(ASTNode* child, ASTNode* aNext = nullptr)
+	IteratorASTNode(uint8_t regIndex, ASTNode* child, ASTNode* aNext = nullptr)
 	: ASTNode(aNext)
 	, child(child)
+	, reg(regIndex)
 	{}
 
 	virtual ~IteratorASTNode() { delete child; }
@@ -122,30 +131,94 @@ public:
 
 	virtual void dump(uint32_t indent = 0) override;
 
+	/**
+	 * First child node to evaluate for each element
+	 */
 	ASTNode* child;
+	/**
+	 * ID of the module to iterate on (0 for entities)
+	 */
+	uint8_t srcID;
+	/**
+	 * index of the register in which the currently iterated element is kept
+	 */
+	uint8_t reg;
 };
 
-class AlwaysTrue : public Condition
+class AlwaysTrue : public ConditionASTNode
 {
 public:
-	virtual bool isSame(Condition* c) { return false; }
-	virtual bool evaluate(ConditionParam* p) { return true; }
-	virtual void dump() override;
+	AlwaysTrue(ASTNode* aThen = nullptr,
+			   ASTNode* aElse = nullptr,
+			   ASTNode* aNext = nullptr)
+	: ConditionASTNode(aThen, aElse, aNext)
+	{}
+	virtual bool evaluate(void* args) { return true; }
+	virtual const char* name() const override { return "always_true"; }
+};
+
+class Sometimes : public ConditionASTNode
+{
+public:
+	Sometimes(ASTNode* aThen = nullptr,
+			   ASTNode* aElse = nullptr,
+			   ASTNode* aNext = nullptr)
+	: ConditionASTNode(aThen, aElse, aNext)
+	, thisTime(false)
+	{}
+	virtual bool evaluate(void* args) {
+		thisTime = !thisTime;
+		printf("sometimes ? %i\n", (int)thisTime);
+		return thisTime;
+	}
+	virtual const char* name() const override { return "sometimes"; }
+	bool thisTime;
+};
+
+class Compare : public ConditionASTNode
+{
+public:
+	Compare(ASTRegister p0, ASTRegister p1,
+			ASTNode* aThen = nullptr,
+			ASTNode* aElse = nullptr,
+			ASTNode* aNext = nullptr)
+	: ConditionASTNode(aThen, aElse, aNext)
+	{
+		regs[0] = p0;
+		regs[1] = p1;
+	}
+
+	virtual uint8_t nParams() override { return 2; }
+
+	virtual ASTRegister paramRegister(uint8_t p) override { return regs[p]; }
+
+	virtual bool evaluate(void* args) override {
+		printf("compare ? %p, %p\n", ((void**)args)[0], ((void**)args)[1]);
+		return true;
+	}
+
+	virtual const char* name() const override {return "compare"; }
+
+	ASTRegister regs[2];
 };
 
 class DoNothing : public Action
 {
 public:
 	virtual void dump() override;
+	virtual void run(ActionParam* param) override {
+		printf("do nothing\n");
+	};
+
 };
 
 
 namespace ast {
 
 ASTNode* ForEach(ASTNode* child);
-ASTNode* If(Condition* a, ASTNode* then, ASTNode* otherwise = nullptr);
-ASTNode* Not(Condition* a, ASTNode* then);
-ASTNode* And(Condition* a, Condition* b, ASTNode* then);
+ASTNode* If(ConditionASTNode* a, ASTNode* then, ASTNode* otherwise = nullptr);
+ASTNode* Not(ConditionASTNode* a, ASTNode* then);
+ASTNode* And(ConditionASTNode* a, ConditionASTNode* b, ASTNode* then);
 ASTNode* Then(Action* a);
 
 void mergeTrees(ASTNode* a, ASTNode* b);
