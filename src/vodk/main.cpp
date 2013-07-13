@@ -6,7 +6,7 @@
 #include "vodk/data/GfxAssets.hpp"
 #include "vodk/logic/AST.hpp"
 #include "vodk/physics/PhysicsModule.hpp"
-#include "vodk/core/IDLookupTable.hpp"
+#include "vodk/core/IDLookupVector.hpp"
 #include "vodk/core/Timeline.hpp"
 
 #include <stdio.h>
@@ -51,6 +51,7 @@ bool mainLoop() {
 
 int main()
 {
+    vodk::unittest::IDLookupVector();
     vodk::unittest::Timeline();
     vodk::unittest::ast();
 
