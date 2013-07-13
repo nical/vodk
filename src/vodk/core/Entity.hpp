@@ -32,6 +32,12 @@ private:
     PluginComponent* _next;
 };
 
+class Module
+{
+public:
+    virtual void update(float dt) = 0;
+    virtual void flush() = 0;
+};
 
 typedef uint8_t EntityState;
 const EntityState ENTITY_STATE_EMPTY        = 0;

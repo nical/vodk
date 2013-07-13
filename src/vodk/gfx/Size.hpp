@@ -23,7 +23,6 @@ struct IntSize : public Size<int> {
     }
 };
 
-
 } // namespace
 } // namespace
 

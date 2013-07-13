@@ -5,6 +5,9 @@
 #include "vodk/gpu/quad.hpp"
 #include "vodk/data/GfxAssets.hpp"
 #include "vodk/logic/AST.hpp"
+#include "vodk/physics/PhysicsModule.hpp"
+#include "vodk/core/IDLookupTable.hpp"
+#include "vodk/core/Timeline.hpp"
 
 #include <stdio.h>
 #include <assert.h>
@@ -14,12 +17,46 @@ unsigned int loadFile(const char* path, char *& buffer);
 using namespace vodk;
 using namespace vodk::data;
 
+
+gpu::RenderingContext* ctx;
+io::Window* window;
+data::ShaderProgramAsset* program_asset;
+data::TextureAsset* texture_asset;
+
+bool mainLoop() {
+    printf("mainLoop\n");
+    io::Window::Event event;
+    while (window->pollEvent(event)) {
+        if (event.type == io::Window::Event::Closed) {
+            return false;
+        }
+    }
+
+    ctx->clear(gpu::targetBuffer(gpu::COLOR_BUFFER|gpu::DEPTH_BUFFER));
+
+    glm::mat4 model_view(1.0);
+    glm::mat4 transform(1.0);
+
+    gpu::ShaderProgram p = program_asset->getShaderProgram();
+    ctx->bind(p);
+    ctx->sendUniform(ctx->getUniformLocation(p, "in_Texture"), 0, texture_asset->getTexture());
+    ctx->sendUniform(ctx->getUniformLocation(p, "in_ModelView"), model_view);
+    ctx->sendUniform(ctx->getUniformLocation(p, "in_Transform"), transform);
+    gpu::drawUnitQuad(ctx);
+
+    window->display();
+    return true;
+}
+
+
 int main()
 {
-    vodk::logic::ast::unittest();
+    vodk::unittest::Timeline();
+    vodk::unittest::ast();
+
     // create the window
-    io::Window window(480, 320, "Vodk");
-    gpu::RenderingContext* ctx = window.getRenderingContext();
+    window = new io::Window(480, 320, "Vodk");
+    ctx = window->getRenderingContext();
     gpu::initQuad(ctx);
     data::InitImageAssetManager();
 
@@ -33,11 +70,11 @@ int main()
                                                   new data::StringAsset(&mgr, "assets/shaders/basic.vert"));
     data::ShaderAsset* fs_asset = new ShaderAsset(&mgr, ctx, gpu::FRAGMENT_SHADER,
                                                   new data::StringAsset(&mgr, "assets/shaders/textured.frag"));
-    data:;ShaderProgramAsset* program_asset = new data::ShaderProgramAsset(&mgr, ctx, vs_asset, fs_asset);
+    program_asset = new data::ShaderProgramAsset(&mgr, ctx, vs_asset, fs_asset);
 
     ImageAsset img_asset(&mgr, "assets/img/test.png");
 
-    TextureAsset texture_asset(&mgr, ctx, &img_asset);
+    texture_asset = new TextureAsset(&mgr, ctx, &img_asset);
 
     if (vs_asset->load() && fs_asset->load()) {
         if (!program_asset->load()) {
@@ -48,44 +85,17 @@ int main()
     }
 
     if (img_asset.load()) {
-        texture_asset.load();
+        texture_asset->load();
     } else {
         printf("failed to load img/test.png\n");
     }
 
-    glm::mat4 model_view(1.0);
-    glm::mat4 transform(1.0);
-
+#ifndef EMSCRITEN
     // main loop
-    bool running = true;
-    while (running) {
-        io::Window::Event event;
-        while (window.pollEvent(event)) {
-            if (event.type == io::Window::Event::Closed) {
-                running = false;
-            }
-#ifdef VODK_WIDGET_SFML
-            else if (event.type == sf::Event::Resized) {
-                ctx->setViewport(0, 0, event.size.width, event.size.height);
-            }
-#endif // SFML
-        }
-
-        ctx->clear(gpu::targetBuffer(gpu::COLOR_BUFFER|gpu::DEPTH_BUFFER));
-
-        gpu::ShaderProgram p = program_asset->getShaderProgram();
-        ctx->bind(p);
-        ctx->sendUniform(ctx->getUniformLocation(p, "in_Texture"), 0, texture_asset.getTexture());
-        ctx->sendUniform(ctx->getUniformLocation(p, "in_ModelView"), model_view);
-        ctx->sendUniform(ctx->getUniformLocation(p, "in_Transform"), transform);
-        gpu::drawUnitQuad(ctx);
-
-        window.display();
-
-#ifdef EMSCRIPTEN
-        running = false;
+    while (mainLoop()) {}
+#else
+    mainLoop();
 #endif
-    }
 
     return 0;
 }

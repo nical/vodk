@@ -84,6 +84,50 @@ public:
 	ASTNode* otherwise;
 };
 
+template<typename T>
+class T1ConditionASTNode : public ConditionASTNode
+{
+public:
+	typedef bool (*FuncType)(T*);
+	T1ConditionASTNode(FuncType f, uint8_t reg)
+	: _function(f)
+	, _reg(reg)
+	{}
+
+	virtual uint8_t nParams() const override { return 1; }
+	virtual uint8_t paramRegister(uint8_t) override { return _reg; }
+
+	virtual bool evaluate(void* param) override {
+		return _function(static_cast<T*>(param));
+	}
+
+	FuncType _function;
+	uint8_t _reg;
+};
+
+template<typename T1, typename T2>
+class T2ConditionASTNode : public ConditionASTNode
+{
+public:
+	typedef bool (*FuncType)(T1*, T2*);
+	T2ConditionASTNode(FuncType f, uint8_t reg)
+	: _function(f)
+	, _reg(reg)
+	{}
+
+	virtual uint8_t nParams() const override { return 2; }
+	virtual uint8_t paramRegister(uint8_t i) override { return _reg[i]; }
+
+	virtual bool evaluate(void* params) override {
+		void** p = (void**)params;
+		return _function(static_cast<T1*>(p[0]),
+						 static_cast<T2*>(p[1]));
+	}
+
+	FuncType _function;
+	uint8_t _reg[2];
+};
+
 /**
  * Node that represents an action
  * may have side effetcs.
@@ -163,11 +207,12 @@ ASTNode* Then(ActionASTNode* a);
 
 void MergeTrees(ASTNode* a, ASTNode* b);
 
-void unittest();
-
 } // ast
 
 } // logic
+
+namespace unittest { void ast(); }
+
 } // vodk
 
 #endif

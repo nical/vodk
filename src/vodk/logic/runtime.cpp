@@ -1,5 +1,5 @@
 
-#include "vodk/logic/eval.hpp"
+#include "vodk/logic/runtime.hpp"
 #include "vodk/logic/AST.hpp"
 #include "vodk/core/Entity.hpp"
 #include "vodk/core/Range.hpp"
@@ -17,7 +17,6 @@ struct RuntimeContext
 		params[2] = nullptr;
 		params[3] = nullptr;
 	}
-		
 
 	Range<Entity> entities;
 	void* params[4];

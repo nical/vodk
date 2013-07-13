@@ -1,6 +1,6 @@
 
 #include "vodk/logic/AST.hpp"
-#include "vodk/logic/eval.hpp"
+#include "vodk/logic/runtime.hpp"
 #include "vodk/logic/BasicNodes.hpp"
 #include <stdio.h>
 
@@ -103,25 +103,32 @@ const char* nodeTypeStr(ASTNodeType type)
 	}
 }
 
-void unittest()
+} // ast
+} // logic
+
+namespace unittest {
+
+using namespace vodk::logic::ast;
+using namespace vodk::logic;
+
+void ast()
 {
-	ASTNode* n1 = ForEach( A,
-		If(new Sometimes,
-			ForEach( B,
-				If(new Compare(A, B),
-					Then(new DoNothing)
-				)
-			)
-		,// else
-			Then(new DoNothing)
-		)
-	);
-	n1->dump();
-	eval_test(n1);
-	delete n1;
+    ASTNode* n1 = ForEach( A,
+        If(new Sometimes,
+            ForEach( B,
+                If(new Compare(A, B),
+                    Then(new DoNothing)
+                )
+            )
+        ,// else
+            Then(new DoNothing)
+        )
+    );
+    n1->dump();
+    eval_test(n1);
+    delete n1;
 }
 
-} // ast
+} // unittest
 
-} // logic
 } // vodk
