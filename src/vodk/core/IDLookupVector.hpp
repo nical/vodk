@@ -8,15 +8,14 @@
 #include <stdio.h>
 
 #include "vodk/core/dump.hpp"
+#include "vodk/core/Range.hpp"
 
 namespace vodk {
 
-template<typename T, typename ID = ObjectID>
+template<typename T, typename Index = ObjectID::Index>
 class IDLookupVector
 {
 public:
-    typedef ID ObjectID;
-    typedef typename ObjectID::Index Index;
     typedef typename ObjectID::Index Offset;
     struct IndexIterator {
         IndexIterator(const Index* pidx) : _idx(const_cast<Index*>(pidx)) {}
@@ -32,6 +31,8 @@ public:
     };
     static const Index INVALID_INDEX = std::numeric_limits<Index>::max();
 
+    uint32_t size() const { return _data.size(); }
+
 	IDLookupVector(Index preallocate = 64)
 	{
 		_data.reserve(preallocate);
@@ -42,13 +43,6 @@ public:
         if (idx > _indices.size()) return false;
         return _indices[idx] != INVALID_INDEX;
     }
-	bool contains(ObjectID id) const {
-        return contains(id.index);
-	}
-
-    const T& get(ObjectID id) const { return get(id.index); }
-
-    T& get(ObjectID id) { return get(id.index); }
 
     const T& get(Index index) const {
         assert(contains(index));
@@ -60,12 +54,12 @@ public:
 		return _data[_indices[index]];
 	}
 
-    T& get(IndexIterator it) {
+    const T& get(IndexIterator it) const {
         assert(*it != INVALID_INDEX);
         return _data[*it];
     }
 
-    const T& get (IndexIterator it) const {
+    T& get(IndexIterator it) {
         assert(*it != INVALID_INDEX);
         return _data[*it];
     }
@@ -99,41 +93,18 @@ public:
         _indices[index] = INVALID_INDEX;
     }
 
-	void remove(ObjectID id) {
-        remove(id.index);
-	}
+    Range<T> range() {
+        return Range<T>(_data.data(), _data.size());
+    }
 
     IndexIterator indices_begin() const {
         return IndexIterator(_indices.size() > 0 ? &_indices[0] : nullptr);
     }
+
     IndexIterator indices_end() const {
         return IndexIterator(_indices.size() > 0 ? &_indices[_indices.size()-1]+1 : nullptr);
     }
-/*
-    void dumpIndices() {
-        printf("indices: ");
-        for (unsigned i = 0; i < _indices.size(); ++i) {
-            printf("%i    ", (int) _indices[i]);
-        }
-        printf("\n");
-    }
 
-    void dumpObjects() {
-        printf("objects: ");
-        for (unsigned i = 0; i < _data.size(); ++i) {
-            debug::dump(_data[i]);
-            printf("(%i) ", (int)_data[i].index);
-        }
-        printf("\n");
-    }
-
-    void dump() {
-        printf("\n");
-        dumpIndices();
-        dumpObjects();
-        printf("\n");
-    }
-*/
 protected:
 	std::vector<Index> _indices;
 	std::vector<T> _data;
