@@ -7,7 +7,7 @@
 #include <stdint.h>
 
 namespace vodk {
-
+/*
 class EntityManager
 {
 public:
@@ -26,7 +26,7 @@ private:
     ObjectID::GenHash _genHash;
     uint32_t _size;
 };
-
+*/
 } // vodk
 
 #endif

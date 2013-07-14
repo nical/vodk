@@ -2,8 +2,9 @@
 #ifndef VODK_CORE_ENTITY_HPP
 #define VODK_CORE_ENTITY_HPP
 
-#include "stdint.h"
+#include <stdint.h>
 #include "vodk/core/ObjectID.hpp"
+#include "vodk/core/SubSystem.hpp"
 
 #define DECLARE_ID(classname) struct classname : public vodk::ObjectID { \
                                   classname(ObjectID::Index i = 0, \
@@ -20,6 +21,7 @@ DECLARE_ID(EntityID)
 DECLARE_ID(GfxComponentID)
 DECLARE_ID(PhysicsComponentID)
 DECLARE_ID(LogicComponentID)
+#undef DECLARE_ID
 
 class PluginComponent {
 public:
@@ -32,16 +34,9 @@ private:
     PluginComponent* _next;
 };
 
-class Module
-{
-public:
-    virtual void update(float dt) = 0;
-    virtual void flush() = 0;
-};
 
 typedef uint8_t EntityState;
-const EntityState ENTITY_STATE_EMPTY        = 0;
-const EntityState ENTITY_STATE_NORMAL       = 1 << 0;
+const EntityState ENTITY_STATE_NORMAL       = 0;
 const EntityState ENTITY_STATE_DESTROYED    = 1 << 1;
 
 class Entity {
@@ -56,9 +51,24 @@ public:
     Family              family;
     EntityState         state;
     ObjectID::GenHash   genHash;
+    ObjectID::Index     index;
+};
+
+class EntitySubSystem : TSubSystem<Entity, EntityID>
+{
+public:
+    typedef TSubSystem<Entity, EntityID> Parent;
+    EntitySubSystem(SubSystem::ID aID, uint32_t preallocate = 64)
+    : Parent(aID, preallocate)
+    {}
+
+    virtual void update(float dt) override {}
+
+    virtual void flush() override {}
+
+    virtual void destroy() override {}
 };
 
 } // vodk
-
 
 #endif

@@ -55,6 +55,8 @@ int main()
     vodk::unittest::Timeline();
     vodk::unittest::ast();
 
+    EntitySubSystem entities(0, 128);
+
     // create the window
     window = new io::Window(480, 320, "Vodk");
     ctx = window->getRenderingContext();

@@ -139,6 +139,12 @@ public:
     {}
 
     template<typename T>
+    DynamicRange(Range<T> r)
+    : _range(r.bytes())
+    , _step(sizeof(T))
+    {}
+
+    template<typename T>
     T* get(uint32_t idx) {
         assert(sizeof(T) == _step);
         return static_cast<T*>((*this)[idx]);

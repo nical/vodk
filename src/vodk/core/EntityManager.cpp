@@ -2,7 +2,7 @@
 #include "vodk/core/EntityManager.hpp"
 
 namespace vodk {
-
+/*
 EntityID EntityManager::addEntity()
 {
     EntityContainer::ChunkIterator it = _entities.chunks();
@@ -73,5 +73,5 @@ uint32_t EntityManager::getAllocatedSize() const
 {
     return sizeof(this) + _entities.getCapacity() * sizeof(Entity);
 }
-
+*/
 } // vodk
