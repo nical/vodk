@@ -17,52 +17,60 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef VODK_CORE_ENTITY_HPP
-#define VODK_CORE_ENTITY_HPP
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
-#include <stdint.h>
-#include "vodk/core/ObjectID.hpp"
 #include "vodk/gfx/Transform.hpp"
 
 namespace vodk {
+namespace gfx {
 
-class Entity;
+Transform::Transform()
+: x(0.0), y(0.0), z(0.0)
+, rx(0.0), ry(0.0), rz(0.0)
+, sx(1.0), sy(1.0), sz(1.0)
+{}
 
-class PluginComponent {
-public:
-    virtual void update(Entity& e, float dt) = 0;
-    virtual void attach(Entity& e, float dt) = 0;
-    virtual void detach(Entity& e, float dt) = 0;
-    PluginComponent* getNext() { return _next; }
-    void setNext(PluginComponent* p) { _next = p; }
-private:
-    PluginComponent* _next;
-};
+Transform::Transform(float aX,  float aY,  float aZ,
+                     float aSx, float aSy, float aSz,
+                     float aRx, float aRy, float aRz)
+: x(aX), y(aY), z(aZ)
+, rx(aRx), ry(aRy), rz(aRz)
+, sx(aSx), sy(aSy), sz(aSz)
+{}
 
-typedef uint8_t EntityState;
-const EntityState ENTITY_STATE_EMPTY        = 0;
-const EntityState ENTITY_STATE_NORMAL       = 1 << 0;
-const EntityState ENTITY_STATE_DESTROYED    = 1 << 1;
+glm::mat4 Transform::matrix() const
+{
+    glm::mat4 result(1.0);
+    glm::translate(result, vec3());
+    glm::rotate(result, rz, glm::vec3(0.0,0.0,1.0));
+    glm::scale(result, glm::vec3(sx, sy, sz));
+    return result;
+}
 
-struct Entity {
-    static const int MAX_COMPONENTS = 8;
+glm::vec3 Transform::vec3() const
+{
+    return glm::vec3(x, y, z);
+}
 
-    gfx::Transform transform;
+glm::vec4 Transform::vec4() const
+{
+    return glm::vec4(x, y, z, 0.0);
+}
 
-    ComponentID components[MAX_COMPONENTS];
-    EntityState state;
-    uint16_t genHash;
+void Transform::translate(float dx, float dy, float dz)
+{
+    x += dx;
+    y += dy;
+    z += dz;
+}
 
-    ComponentID* getComponent(SubSystemID system) {
-        for (unsigned i = 0; i < MAX_COMPONENTS; ++i) {
-            if (components[i].subSystem == system) {
-                return &components[i];
-            }
-        }
-        return nullptr;
-    }
-};
+void Transform::translate(const glm::vec3& offset)
+{
+    x += offset.x;
+    y += offset.y;
+    z += offset.z;
+}
 
+} // gfx
 } // vodk
-
-#endif

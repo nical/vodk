@@ -17,50 +17,58 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef VODK_CORE_ENTITY_HPP
-#define VODK_CORE_ENTITY_HPP
+#ifndef VODK_LOGIC_SCOPE_HPP
+#define VODK_LOGIC_SCOPE_HPP
 
-#include <stdint.h>
+#include <vector>
+#include <assert.h>
+
+#include "vodk/core/Entity.hpp"
 #include "vodk/core/ObjectID.hpp"
-#include "vodk/gfx/Transform.hpp"
+#include "vodk/core/Range.hpp"
+#include "vodk/core/SubSystem.hpp"
 
 namespace vodk {
 
-class Entity;
+class Transform2DSubSystem;
+class GfxSubSystem;
+class PhysicsSubSystem;
+class ControlerSubSystem;
+class LogicSubSystem;
 
-class PluginComponent {
-public:
-    virtual void update(Entity& e, float dt) = 0;
-    virtual void attach(Entity& e, float dt) = 0;
-    virtual void detach(Entity& e, float dt) = 0;
-    PluginComponent* getNext() { return _next; }
-    void setNext(PluginComponent* p) { _next = p; }
-private:
-    PluginComponent* _next;
+namespace gfx {
+class Transform;
+} // gfx
+
+struct EntityDescriptor {
+    Range<SubSystemID> components;
 };
 
-typedef uint8_t EntityState;
-const EntityState ENTITY_STATE_EMPTY        = 0;
-const EntityState ENTITY_STATE_NORMAL       = 1 << 0;
-const EntityState ENTITY_STATE_DESTROYED    = 1 << 1;
+class Scope {
+public:
+    Scope();
+    ~Scope();
 
-struct Entity {
-    static const int MAX_COMPONENTS = 8;
+    EntityID addEntity(EntityDescriptor& desc);
 
-    gfx::Transform transform;
+    void removeEntity(EntityID id);
 
-    ComponentID components[MAX_COMPONENTS];
-    EntityState state;
-    uint16_t genHash;
+    bool containsEntity(EntityID id);
 
-    ComponentID* getComponent(SubSystemID system) {
-        for (unsigned i = 0; i < MAX_COMPONENTS; ++i) {
-            if (components[i].subSystem == system) {
-                return &components[i];
-            }
-        }
-        return nullptr;
-    }
+    void markEntityDestroyed(EntityID aID);
+
+    SubSystem* getSubsystem(SubSystemID id);
+
+    void addSubSystem(SubSystem* toAdd);
+
+    gfx::Transform& getTransform(EntityID id);
+
+protected:
+    // the entities are used as a lookup table for the standard components
+    std::vector<Entity> _entities;
+    SubSystem* _subSystems[SYSTEM_COUNT];
+    SubSystemID _scopeID;
+    uint16_t _genHash;
 };
 
 } // vodk

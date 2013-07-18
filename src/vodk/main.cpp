@@ -8,6 +8,10 @@
 #include "vodk/physics/PhysicsModule.hpp"
 #include "vodk/core/IDLookupVector.hpp"
 #include "vodk/core/Timeline.hpp"
+#include "vodk/gfx/GfxSubSystem.hpp"
+#include "vodk/core/Scope.hpp"
+
+#include <glm/gtc/matrix_transform.hpp>
 
 #include <stdio.h>
 #include <assert.h>
@@ -23,6 +27,9 @@ io::Window* window;
 data::ShaderProgramAsset* program_asset;
 data::TextureAsset* texture_asset;
 
+gfx::BasicGfxSubSystem* gfxComponents;
+Scope* scope;
+
 bool mainLoop() {
     printf("mainLoop\n");
     io::Window::Event event;
@@ -36,15 +43,19 @@ bool mainLoop() {
 
     glm::mat4 model_view(1.0);
     glm::mat4 transform(1.0);
-
+/*
     gpu::ShaderProgram p = program_asset->getShaderProgram();
     ctx->bind(p);
     ctx->sendUniform(ctx->getUniformLocation(p, "in_Texture"), 0, texture_asset->getTexture());
     ctx->sendUniform(ctx->getUniformLocation(p, "in_ModelView"), model_view);
     ctx->sendUniform(ctx->getUniformLocation(p, "in_Transform"), transform);
     gpu::drawUnitQuad(ctx);
+*/
+    gfxComponents->render(16.0);
 
+    printf("foo\n");
     window->display();
+    printf("bar\n");
     return true;
 }
 
@@ -55,13 +66,15 @@ int main()
     vodk::unittest::Timeline();
     vodk::unittest::ast();
 
-    EntitySubSystem entities(0, 128);
 
     // create the window
     window = new io::Window(480, 320, "Vodk");
     ctx = window->getRenderingContext();
     gpu::initQuad(ctx);
     data::InitImageAssetManager();
+    ctx->setViewport(0,0,480,320);
+
+    scope = new Scope;
 
     assert(ctx->isSupported(gpu::FRAGMENT_SHADING));
 
@@ -92,6 +105,13 @@ int main()
     } else {
         printf("failed to load img/test.png\n");
     }
+
+    gfxComponents = new vodk::gfx::BasicGfxSubSystem(nullptr, 1, ctx, program_asset, texture_asset);
+    gfx::BasicGfxComponent gfxcomp1(0, glm::mat4(1.0));
+    glm::mat4 m1(1.0);
+    gfx::BasicGfxComponent gfxcomp2(1, glm::translate(m1, glm::vec3(-1.0, 0.0, 0.0)));
+    //gfxComponents->add(gfxcomp1);
+    //gfxComponents->add(gfxcomp2);
 
 #ifndef EMSCRITEN
     // main loop

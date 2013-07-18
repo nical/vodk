@@ -17,52 +17,45 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef VODK_CORE_ENTITY_HPP
-#define VODK_CORE_ENTITY_HPP
+#ifndef VODK_GFX_TRANSFORM_HPP
+#define VODK_GFX_TRANSFORM_HPP
 
-#include <stdint.h>
-#include "vodk/core/ObjectID.hpp"
-#include "vodk/gfx/Transform.hpp"
+#include <glm/glm.hpp>
 
 namespace vodk {
+namespace gfx {
 
-class Entity;
-
-class PluginComponent {
+class Transform {
 public:
-    virtual void update(Entity& e, float dt) = 0;
-    virtual void attach(Entity& e, float dt) = 0;
-    virtual void detach(Entity& e, float dt) = 0;
-    PluginComponent* getNext() { return _next; }
-    void setNext(PluginComponent* p) { _next = p; }
-private:
-    PluginComponent* _next;
+    Transform();
+    Transform(float aX, float aY, float aZ,
+              float aSx = 1.0, float aSy = 1.0, float aSz = 1.0,
+              float aRx = 0.0, float aRy = 0.0, float aRz = 0.0);
+
+    float x;
+    float y;
+    float z;
+
+    float sx;
+    float sy;
+    float sz;
+
+    float rx;
+    float ry;
+    float rz;
+
+    glm::mat4 matrix() const;
+    glm::mat4 rotationMatrix() const;
+    glm::mat4 translationMatrix() const;
+    glm::mat4 scaleMatrix() const;
+    glm::vec3 vec3() const;
+    glm::vec4 vec4() const;
+
+    void translate(float dx, float dy, float dz);
+    void translate(const glm::vec3& offset);
 };
 
-typedef uint8_t EntityState;
-const EntityState ENTITY_STATE_EMPTY        = 0;
-const EntityState ENTITY_STATE_NORMAL       = 1 << 0;
-const EntityState ENTITY_STATE_DESTROYED    = 1 << 1;
-
-struct Entity {
-    static const int MAX_COMPONENTS = 8;
-
-    gfx::Transform transform;
-
-    ComponentID components[MAX_COMPONENTS];
-    EntityState state;
-    uint16_t genHash;
-
-    ComponentID* getComponent(SubSystemID system) {
-        for (unsigned i = 0; i < MAX_COMPONENTS; ++i) {
-            if (components[i].subSystem == system) {
-                return &components[i];
-            }
-        }
-        return nullptr;
-    }
-};
-
+} // gfx
 } // vodk
 
 #endif

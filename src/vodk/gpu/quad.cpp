@@ -28,7 +28,7 @@ void initQuad(RenderingContext* ctx) {
     ScopedBind<VertexArray> bind_vao(ctx, _vao);
 
     // vertices
-    {        
+    {
         _vertex_vbo = ctx->createVertexBuffer();
         ScopedBind<VertexBuffer> bind_vbo(ctx, _vertex_vbo);
         ctx->upload(_vertex_vbo, slice(vertices, 12).bytes());

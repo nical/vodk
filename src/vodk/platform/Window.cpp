@@ -19,33 +19,6 @@ void deleteRenderingContext(RenderingContext* ctx);
 
 namespace io {
 
-
-#ifdef VODK_WIDGET_SFML
-
-Window::Window(int w, int h, const char* title)
-: sf::Window(sf::VideoMode(w, h),
-             title,
-             sf::Style::Default,
-             sf::ContextSettings(32))
-{
-    setVerticalSyncEnabled(true);
-    gpu::initBackend();
-    _gl = gpu::createRenderingContext(this);
-}
-
-Window::~Window() {
-    gpu::deleteRenderingContext(_gl);
-}
-
-gpu::RenderingContext* Window::getRenderingContext() {
-    return _gl;
-}
-
-#endif // VODK_WIDGET_SFML
-
-
-
-
 #ifdef VODK_WIDGET_SDL
 
 Window::Window(int w, int h, const char* title)
@@ -77,7 +50,7 @@ void Window::display()
 {
     SDL_GL_SwapBuffers();
 #if !EMSCRIPTEN
-    SDL_Delay(1500);
+    SDL_Delay(16);
 #endif
 }
 
