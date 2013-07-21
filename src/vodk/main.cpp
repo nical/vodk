@@ -5,7 +5,6 @@
 #include "vodk/gpu/quad.hpp"
 #include "vodk/data/GfxAssets.hpp"
 #include "vodk/logic/AST.hpp"
-#include "vodk/physics/PhysicsModule.hpp"
 #include "vodk/core/IDLookupVector.hpp"
 #include "vodk/core/Timeline.hpp"
 #include "vodk/gfx/GfxSubSystem.hpp"
