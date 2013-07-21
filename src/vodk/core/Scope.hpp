@@ -63,6 +63,7 @@ public:
 
     gfx::Transform& getTransform(EntityID id);
 
+    void resolve_dependencies(); // TODO
 protected:
     // the entities are used as a lookup table for the standard components
     std::vector<Entity> _entities;

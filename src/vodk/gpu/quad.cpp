@@ -31,7 +31,7 @@ void initQuad(RenderingContext* ctx) {
     {
         _vertex_vbo = ctx->createVertexBuffer();
         ScopedBind<VertexBuffer> bind_vbo(ctx, _vertex_vbo);
-        ctx->upload(_vertex_vbo, slice(vertices, 12).bytes());
+        ctx->upload(_vertex_vbo, range(vertices, 12).bytes());
         ctx->defineVertexAttribute(0, gpu::FLOAT, 3, 0, 0);
         ctx->enableVertexAttribute(0);
     }
@@ -40,7 +40,7 @@ void initQuad(RenderingContext* ctx) {
     {    
         _texcoord_vbo = ctx->createVertexBuffer();
         ScopedBind<VertexBuffer> bind_vbo(ctx, _texcoord_vbo);
-        ctx->upload(_texcoord_vbo, slice(tex_coords, 8).bytes());
+        ctx->upload(_texcoord_vbo, range(tex_coords, 8).bytes());
         ctx->defineVertexAttribute(1, gpu::FLOAT, 2, 0, 0);
         ctx->enableVertexAttribute(1);
     }

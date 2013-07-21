@@ -22,6 +22,7 @@
 
 #include <stdint.h>
 #include <assert.h>
+#include "vodk/core/Range.hpp"
 
 /**
  * Typed view on a bounded buffer of memory.
@@ -133,7 +134,7 @@ protected:
 friend class DynamicRange;
 };
 
-template<typename T> Range<T> slice(T* ptr, uint32_t size) {
+template<typename T> Range<T> range(T* ptr, uint32_t size) {
     return Range<T>(ptr,size);
 }
 

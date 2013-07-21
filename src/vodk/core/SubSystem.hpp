@@ -39,6 +39,8 @@ struct SubSystem {
 
     virtual void update(float dt) {}
     virtual void flush() {};
+
+    virtual Range<SubSystemID> dependencies() = 0;
 };
 
 template<typename T>
