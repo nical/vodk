@@ -37,12 +37,12 @@ static void printNodes(const Node* n) {
         return;
     }
     printNodes(n->getParent());
-    if (n->isInArray()) {
-        printf(".[%i]", n->getIndex());
-    } else if (n->isInObject()) {
-        printf(".%s", n->getName().c_str());
+    if (n->is_in_array()) {
+        printf(".[%i]", n->get_index());
+    } else if (n->is_in_Object()) {
+        printf(".%s", n->get_name().c_str());
     } else {
-        //printf("<%i>", n->getType());
+        //printf("<%i>", n->get_type());
     }
 }
 
@@ -179,16 +179,16 @@ bool Parser::parse(const char* src, int nChars) {
                                           TYPE_OBJECT,
                                           _currentName,
                                           _currentIndex);
-            onObjectStart(_currentNode);
+            on_object_start(_currentNode);
             ++it;
             continue;
         }
         if (*it == '}') {
-            onObjectEnd(_currentNode);
-            if (!_currentNode || _currentNode->getType() != TYPE_OBJECT) {
-                onError(ERROR_UNEXPECTED_OBJECT_END);
+            on_object_end(_currentNode);
+            if (!_currentNode || _currentNode->get_type() != TYPE_OBJECT) {
+                on_error(ERROR_UNEXPECTED_OBJECT_END);
             }
-            popNode();
+            pop_node();
             ++it;
             continue;
         }
@@ -201,28 +201,28 @@ bool Parser::parse(const char* src, int nChars) {
                                           _currentName,
                                           _currentIndex);
             _currentIndex = 0;
-            onArrayStart(_currentNode);
+            on_array_start(_currentNode);
             ++it;
             continue;
         }
         if (*it == ']') {
-            onArrayEnd(_currentNode);
-            if (!_currentNode || _currentNode->getType() != TYPE_ARRAY) {
-                onError(ERROR_UNEXPECTED_ARRAY_END);
+            on_array_end(_currentNode);
+            if (!_currentNode || _currentNode->get_type() != TYPE_ARRAY) {
+                on_error(ERROR_UNEXPECTED_ARRAY_END);
             }
-            popNode();
+            pop_node();
             ++it;
             continue;
         }
         if (*it == ',') {
             if (!(_state & EXPECT_COMMA)) {
-                onError(ERROR_UNEXPECTED_COMMA);
+                on_error(ERROR_UNEXPECTED_COMMA);
                 abort();
             }
-            if (isInObject()) {
+            if (is_in_Object()) {
                 _state = EXPECT_NAME;
                 _currentName = "";
-            } else if (isInArray()) {
+            } else if (is_in_array()) {
                 _state = EXPECT_VALUE;
                 ++_currentIndex;
             }
@@ -231,7 +231,7 @@ bool Parser::parse(const char* src, int nChars) {
         }
         if (*it == ':') {
             if (!(_state & EXPECT_COLON)) {
-                onError(ERROR_UNEXPECTED_COLON);
+                on_error(ERROR_UNEXPECTED_COLON);
                 abort();
             }
             _state = EXPECT_VALUE;
@@ -242,7 +242,7 @@ bool Parser::parse(const char* src, int nChars) {
             const char* it2 = it + 1;
             while (*it2 != '"') {
                 if (it2 >= src + nChars) {
-                    onError(ERROR_UNTERMINATED_STRING);
+                    on_error(ERROR_UNTERMINATED_STRING);
                     abort();
                 }
                 if (*it2 == '\\') {
@@ -257,9 +257,9 @@ bool Parser::parse(const char* src, int nChars) {
                 _state = EXPECT_COMMA|EXPECT_END;
                 Node n(0,_currentNode, TYPE_STRING, _currentName, _currentIndex);
                 n._str = std::string(it + 1, it2 - it - 1);
-                onValue(&n);
+                on_value(&n);
             } else {
-                onError(ERROR_UNEXPECTED_STRING);
+                on_error(ERROR_UNEXPECTED_STRING);
                 abort();
             }
 
@@ -272,7 +272,7 @@ bool Parser::parse(const char* src, int nChars) {
             _state = EXPECT_COMMA|EXPECT_END;
             Node n(++_nextID, _currentNode, TYPE_BOOLEAN, _currentName, _currentIndex);
             n._boolean = true;
-            onValue(&n);
+            on_value(&n);
             while (nReadChars > 0) {
                 ++it;
                 --nReadChars;
@@ -284,7 +284,7 @@ bool Parser::parse(const char* src, int nChars) {
             _state = EXPECT_COMMA|EXPECT_END;
             Node n(++_nextID, _currentNode, TYPE_BOOLEAN, _currentName, _currentIndex);
             n._boolean = false;
-            onValue(&n);
+            on_value(&n);
             while (nReadChars > 0) {
                 ++it;
                 --nReadChars;
@@ -295,7 +295,7 @@ bool Parser::parse(const char* src, int nChars) {
             assert(_state & EXPECT_VALUE);
             _state = EXPECT_COMMA|EXPECT_END;
             Node n(++_nextID, _currentNode, TYPE_NULL, _currentName, _currentIndex);
-            onValue(&n);
+            on_value(&n);
             while (nReadChars > 0) {
                 ++it;
                 --nReadChars;
@@ -305,20 +305,20 @@ bool Parser::parse(const char* src, int nChars) {
         double val = 0.0;
         if (parseNumber(it, nChars - (src - it), &val, &nReadChars)) {
             if (!(_state & EXPECT_VALUE)) {
-                onError(ERROR_UNEXPECTED_VALUE);
+                on_error(ERROR_UNEXPECTED_VALUE);
                 abort();
             }
             _state = EXPECT_COMMA|EXPECT_END;
             Node n(++_nextID, _currentNode, TYPE_NUMBER, _currentName, _currentIndex);
             n._number = val;
-            onValue(&n);
+            on_value(&n);
             while (nReadChars > 0) {
                 ++it;
                 --nReadChars;
             }
             continue;
         }
-        onError(ERROR_SYNTAX);
+        on_error(ERROR_SYNTAX);
         _state |= CAN_RESET;
         return false;
     }
@@ -332,7 +332,7 @@ void Parser::abort() {
 
 void Parser::reset() {
     assert(_state & CAN_RESET);
-    onReset();
+    on_reset();
     _state = EXPECT_VALUE|CAN_RESET;
     _currentIndex = -1;
     _nextID = 0;
@@ -343,26 +343,26 @@ void Parser::reset() {
     }
 }
 
-bool Parser::isFinished() const {
+bool Parser::is_finished() const {
     return _currentNode == nullptr;
 }
 
-bool Parser::isInArray() const
+bool Parser::is_in_array() const
 {
-    return _currentNode ? _currentNode->getType() == TYPE_ARRAY
+    return _currentNode ? _currentNode->get_type() == TYPE_ARRAY
                         : false;
 }
 
-bool Parser::isInObject() const
+bool Parser::is_in_Object() const
 {
-    return _currentNode ? _currentNode->getType() == TYPE_OBJECT
+    return _currentNode ? _currentNode->get_type() == TYPE_OBJECT
                         : false;
 }
 
-void Parser::popNode()
+void Parser::pop_node()
 {
     Node* n = _currentNode;
-    _currentIndex = n->getIndex();
+    _currentIndex = n->get_index();
     _currentName = "";
     _currentNode = n->_parent;
     delete n;
@@ -371,64 +371,64 @@ void Parser::popNode()
     }
 }
 
-void Parser::onError(json::Error err) {
+void Parser::on_error(json::Error err) {
     printf("Error <%i>\n", err);
     abort();
 }
 
 class Minifier : public json::Parser {
 public:
-    virtual void onObjectStart(const json::Node* n) {
+    virtual void on_object_start(const json::Node* n) {
         maybeComa(n);
         maybeName(n);
         printf("{");
         firstElt = true;
     }
-    virtual void onObjectEnd(const  json::Node* n) {
+    virtual void on_object_end(const  json::Node* n) {
         printf("}");
     }
-    virtual void onArrayStart(const json::Node* n) {
+    virtual void on_array_start(const json::Node* n) {
         maybeComa(n);
         maybeName(n);
         printf("[");
     }
-    virtual void onArrayEnd(const json::Node* n) {
+    virtual void on_array_end(const json::Node* n) {
         printf("]");
     }
-    virtual void onValue(const json::Node* n) {
+    virtual void on_value(const json::Node* n) {
         maybeComa(n);
         maybeName(n);
-        switch (n->getType()) {
+        switch (n->get_type()) {
             case TYPE_BOOLEAN:
-                printf(n->getBoolean()?"true":"false");
+                printf(n->get_boolean()?"true":"false");
                 break;
             case TYPE_STRING:
-                printf("\"%s\"", n->getString().c_str());
+                printf("\"%s\"", n->get_string().c_str());
                 break;
             case TYPE_NULL:
                 printf("null");
                 break;
             case TYPE_NUMBER:
-                printf("%f", n->getNumber());
+                printf("%f", n->get_number());
                 break;
             default:
                 assert("unexpected"=="type");
         }
     }
-    virtual void onReset() {
+    virtual void on_reset() {
         firstElt = false;
     }
     void maybeComa(const Node* n) {
-        if (n->isInObject() && !firstElt) {
+        if (n->is_in_Object() && !firstElt) {
             printf(",");
-        } else if (n->isInArray() && n->getIndex() > 0) {
+        } else if (n->is_in_array() && n->get_index() > 0) {
             printf(",");
         }
         firstElt = false;
     }
     void maybeName(const Node* n) {
-        if (n->isInObject()) {
-            printf("\"%s\":", n->getName().c_str());
+        if (n->is_in_Object()) {
+            printf("\"%s\":", n->get_name().c_str());
         }
     }
 
@@ -438,7 +438,7 @@ public:
 
 class Formater : public json::Parser {
 public:
-    virtual void onObjectStart(const json::Node* n) {
+    virtual void on_object_start(const json::Node* n) {
         maybeComa(n);
         indent();
         maybeName(n);
@@ -446,58 +446,58 @@ public:
         firstElt = true;
         ++indentation;
     }
-    virtual void onObjectEnd(const  json::Node* n) {
+    virtual void on_object_end(const  json::Node* n) {
         --indentation;
         indent();
         printf("}");
     }
-    virtual void onArrayStart(const json::Node* n) {
+    virtual void on_array_start(const json::Node* n) {
         maybeComa(n);
         indent();
         maybeName(n);
         printf("[");
         ++indentation;
     }
-    virtual void onArrayEnd(const json::Node* n) {
+    virtual void on_array_end(const json::Node* n) {
         --indentation;
         indent();
         printf("]");
     }
-    virtual void onValue(const json::Node* n) {
+    virtual void on_value(const json::Node* n) {
         maybeComa(n);
         indent();
         maybeName(n);
-        switch (n->getType()) {
+        switch (n->get_type()) {
             case TYPE_BOOLEAN:
-                printf(n->getBoolean()?"true":"false");
+                printf(n->get_boolean()?"true":"false");
                 break;
             case TYPE_STRING:
-                printf("\"%s\"", n->getString().c_str());
+                printf("\"%s\"", n->get_string().c_str());
                 break;
             case TYPE_NULL:
                 printf("null");
                 break;
             case TYPE_NUMBER:
-                printf("%f", n->getNumber());
+                printf("%f", n->get_number());
                 break;
             default:
                 assert("unexpected"=="type");
         }
     }
-    virtual void onReset() {
+    virtual void on_reset() {
         firstElt = false;
     }
     void maybeComa(const Node* n) {
-        if (n->isInObject() && !firstElt) {
+        if (n->is_in_Object() && !firstElt) {
             printf(",");
-        } else if (n->isInArray() && n->getIndex() > 0) {
+        } else if (n->is_in_array() && n->get_index() > 0) {
             printf(",");
         }
         firstElt = false;
     }
     void maybeName(const Node* n) {
-        if (n->isInObject()) {
-            printf("\"%s\": ", n->getName().c_str());
+        if (n->is_in_Object()) {
+            printf("\"%s\": ", n->get_name().c_str());
         }
     }
     void indent() {
@@ -545,7 +545,7 @@ int main(int argc, char** argv) {
     json::Formater m(2);
     m.reset();
     assert(m.parse(argv[1], strlen(argv[1])));
-    assert(m.isFinished());
+    assert(m.is_finished());
     m.reset();
     m.reset();
     printf("\n");

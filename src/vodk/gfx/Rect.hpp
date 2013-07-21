@@ -46,9 +46,9 @@ struct Rect
 
     Range<const T> range() const { return Range<const T>(&x, 4); }
 
-    T xMost() const { return x + width; }
+    T x_most() const { return x + width; }
 
-    T yMost() const { return y + height; }
+    T y_most() const { return y + height; }
 };
 
 typedef Rect<float> FloatRect;

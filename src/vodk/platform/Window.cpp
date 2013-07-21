@@ -42,7 +42,7 @@ Window::~Window() {
     gpu::deleteRenderingContext(_gl);
 }
 
-gpu::RenderingContext* Window::getRenderingContext() {
+gpu::RenderingContext* Window::get_rendering_context() {
     return _gl;
 }
 
@@ -54,7 +54,7 @@ void Window::display()
 #endif
 }
 
-bool Window::pollEvent(Event& e)
+bool Window::poll_events(Event& e)
 {
     SDL_Event sdl_evt;
     bool ret = SDL_PollEvent(&sdl_evt);

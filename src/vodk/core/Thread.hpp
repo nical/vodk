@@ -49,10 +49,10 @@ public:
     void sendStop();
     void join();
 
-    const char* getName() const {
+    const char* get_name() const {
         return _name;
     }
-    ThreadData* getData() const {
+    ThreadData* get_data() const {
         return _data;
     }
 

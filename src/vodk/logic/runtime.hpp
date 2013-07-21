@@ -15,7 +15,7 @@ typedef uint8_t RuntimeModuleID;
 class RuntimeModule
 {
 public:
-	virtual RuntimeModuleID getID() = 0;
+	virtual RuntimeModuleID get_id() = 0;
 	virtual DynamicRange getElements(int32_t flags = 0);
 };
 

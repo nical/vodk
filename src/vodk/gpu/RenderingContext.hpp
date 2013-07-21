@@ -159,78 +159,78 @@ public:
 
     virtual ~RenderingContext() {}
 
-    virtual void setViewport(int x, int y, int w, int h) = 0;
-    virtual void setClearColor(float r, float g, float b, float a) = 0;
+    virtual void set_viewport(int x, int y, int w, int h) = 0;
+    virtual void set_clear_color(float r, float g, float b, float a) = 0;
     virtual void clear(TargetBuffer target) = 0;
 
-    virtual VertexArray createVertexArray() = 0;
-    virtual void deleteVertexArray(VertexArray& vao) = 0;
+    virtual VertexArray create_vertex_array() = 0;
+    virtual void delete_vertex_array(VertexArray& vao) = 0;
     virtual void bind(const VertexArray& vao) = 0;
     virtual void unbind(const VertexArray& vao) = 0;
     /**
      * Enable a given vertex attribute location to be used with a VertexBuffer
      * as input.
      * the values in the generic vertex attribute array will be accessed and 
-     * used for rendering when calls are made to drawArrays.
+     * used for rendering when calls are made to draw_arrays.
      */
-    virtual void enableVertexAttribute(int index) = 0;
-    virtual void disableVertexAttribute(int index) = 0;
-    virtual VertexBuffer createVertexBuffer() = 0;
-    virtual void deleteVertexBuffer(VertexBuffer& vbo) = 0;
+    virtual void enable_vertex_attribute(int index) = 0;
+    virtual void disable_vertex_attribute(int index) = 0;
+    virtual VertexBuffer create_vertex_buffer() = 0;
+    virtual void delete_vertex_buffer(VertexBuffer& vbo) = 0;
     virtual void bind(const VertexBuffer& vbo) = 0;
     virtual void unbind(const VertexBuffer& vbo) = 0;
     virtual void upload(const VertexBuffer& buf,
                         Range<byte> data,
                         UploadFlags flags = UPLOAD_DEFAULT) = 0;
 
-    virtual gpu::Texture createTexture(gpu::UpdateHint hint = gpu::STATIC_UPDATE) = 0;
-    virtual void deleteTexture(gpu::Texture tex) = 0;
+    virtual gpu::Texture create_texture(gpu::UpdateHint hint = gpu::STATIC_UPDATE) = 0;
+    virtual void delete_texture(gpu::Texture tex) = 0;
     virtual void bind(gpu::Texture tex) = 0;
     virtual void unbind(gpu::Texture tex) = 0;
-    virtual void setTextureFlags(gpu::Texture tex, TextureFlags flags) = 0;
+    virtual void set_texture_flags(gpu::Texture tex, TextureFlags flags) = 0;
     virtual void upload(gpu::Texture dest,
                         gfx::Surface* src,
                         UploadFlags flags = UPLOAD_DEFAULT) = 0;
-    virtual void defineVertexAttribute(int attribIndex,
+    virtual void define_vertex_attribute(int attribIndex,
                                        gpu::AttributeType type,
                                        int compPerVertex,
                                        int stride = 0, // zero means tightly packed attributes (=sizeof(type))
                                        int offset = 0) = 0;
 
-    virtual gpu::Shader createShader(gpu::ShaderType type) = 0;
-    virtual gpu::ShaderProgram createShaderProgram() = 0;
-    virtual void deleteShader(gpu::Shader shader) = 0;
-    virtual bool compileShader(gpu::Shader, const ShaderSource& src) = 0;
+    virtual gpu::Shader create_shader(gpu::ShaderType type) = 0;
+    virtual gpu::ShaderProgram create_shaderProgram() = 0;
+    virtual void delete_shader(gpu::Shader shader) = 0;
+    virtual bool compile_shader(gpu::Shader, const ShaderSource& src) = 0;
     virtual void bind(gpu::ShaderProgram s) = 0;
     virtual void unbind(gpu::ShaderProgram s) = 0;
-    virtual void attachShader(gpu::ShaderProgram p, gpu::Shader s) = 0;
-    virtual bool linkShaderProgram(gpu::ShaderProgram p) = 0;
-    virtual bool bindAttributeLocation(gpu::ShaderProgram p,
+    virtual void attach_shader(gpu::ShaderProgram p, gpu::Shader s) = 0;
+    virtual bool link_shader_program(gpu::ShaderProgram p) = 0;
+    virtual bool bind_attribute_location(gpu::ShaderProgram p,
                                        int location,
                                        const char* name) = 0;
-    virtual void sendUniform(int location, float val) = 0;
-    virtual void sendUniform(int location, const glm::vec2& val) = 0;
-    virtual void sendUniform(int location, const glm::vec3& val) = 0;
-    virtual void sendUniform(int location, const glm::vec4& val) = 0;
-    virtual void sendUniform(int location, const glm::mat4& val) = 0;
-    virtual void sendUniform(int uniformLocation,
+    virtual void send_unirform(int location, float val) = 0;
+    virtual void send_unirform(int location, const glm::vec2& val) = 0;
+    virtual void send_unirform(int location, const glm::vec3& val) = 0;
+    virtual void send_unirform(int location, const glm::vec4& val) = 0;
+    virtual void send_unirform(int location, const glm::mat4& val) = 0;
+    virtual void send_unirform(int uniformLocation,
                              int textureUnit,
                              const Texture& tex) = 0;
 
-    virtual int getUniformLocation(const ShaderProgram& p, const char* name) = 0;
+    virtual int get_uniform_location(const ShaderProgram& p, const char* name) = 0;
 
-    virtual void drawArrays(gpu::DrawMode mode, int first, int count) = 0;
+    virtual void draw_arrays(gpu::DrawMode mode, int first, int count) = 0;
 
-    virtual bool isSupported(gpu::Feature feature) = 0;
-    virtual bool isSupported(const char* str) = 0; // platform specific string
-    virtual void makeCurrent() = 0;
+    virtual bool is_supported(gpu::Feature feature) = 0;
+    virtual bool is_supported(const char* str) = 0; // platform specific string
+    virtual void make_current() = 0;
 
 };
 
 class RenderingContext2 {
 public:
-    virtual void setViewport(int x, int y, int w, int h) = 0;
-    virtual void setClearColor(float r, float g, float b, float a) = 0;
+    virtual void set_viewport(int x, int y, int w, int h) = 0;
+    virtual void set_clear_color(float r, float g, float b, float a) = 0;
     virtual void clear(TargetBuffer target) = 0;
 
     virtual void draw(const RenderTarget& target,
@@ -238,7 +238,7 @@ public:
                       ShaderInputIterator* inputs,
                       const Shader& shader,
                       DrawMode mode = gpu::TRIANGLES) = 0;
-    virtual Texture createTexture(const TextureDescriptor& desc);
+    virtual Texture create_texture(const TextureDescriptor& desc);
 };
 
 } // namespace

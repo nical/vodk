@@ -24,61 +24,61 @@ namespace gpu {
 
 class RenderingContextGLES2 : public RenderingContext {
 public:
-    virtual void setViewport(int x, int y, int w, int h) override;
-    virtual void setClearColor(float r, float g, float b, float a) override;
+    virtual void set_viewport(int x, int y, int w, int h) override;
+    virtual void set_clear_color(float r, float g, float b, float a) override;
     virtual void clear(TargetBuffer target) override;
 
-    virtual gpu::VertexArray createVertexArray() override;
-    virtual void deleteVertexArray(VertexArray& vao) override;
+    virtual gpu::VertexArray create_vertex_array() override;
+    virtual void delete_vertex_array(VertexArray& vao) override;
     virtual void bind(const VertexArray& vao) override;
     virtual void unbind(const VertexArray& vao) override;
-    virtual gpu::VertexBuffer createVertexBuffer() override;
-    virtual void deleteVertexBuffer(VertexBuffer& vbo) override;
+    virtual gpu::VertexBuffer create_vertex_buffer() override;
+    virtual void delete_vertex_buffer(VertexBuffer& vbo) override;
     virtual void bind(const VertexBuffer& vbo) override;
     virtual void unbind(const VertexBuffer& vbo) override;
     virtual void upload(const VertexBuffer& buf, Range<byte> data, UploadFlags flags = UPLOAD_DEFAULT);
 
-    virtual gpu::Texture createTexture(gpu::UpdateHint hint) override;
-    virtual void deleteTexture(gpu::Texture tex) override;
+    virtual gpu::Texture create_texture(gpu::UpdateHint hint) override;
+    virtual void delete_texture(gpu::Texture tex) override;
     virtual void bind(gpu::Texture tex) override;
     virtual void unbind(gpu::Texture tex) override;
-    virtual void setTextureFlags(gpu::Texture tex, TextureFlags flags) override;
+    virtual void set_texture_flags(gpu::Texture tex, TextureFlags flags) override;
     virtual void upload(gpu::Texture dest, gfx::Surface* src, UploadFlags flags) override;
-    virtual void defineVertexAttribute(int attribIndex,
+    virtual void define_vertex_attribute(int attribIndex,
                                        gpu::AttributeType type,
                                        int compPerVertex,
                                        int stride,
                                        int offset) override;
-    virtual void enableVertexAttribute(int index) override;
-    virtual void disableVertexAttribute(int index) override;
+    virtual void enable_vertex_attribute(int index) override;
+    virtual void disable_vertex_attribute(int index) override;
 
 
-    virtual gpu::Shader createShader(gpu::ShaderType type) override;
-    virtual gpu::ShaderProgram createShaderProgram() override;
-    virtual void deleteShader(gpu::Shader shader) override;
-    virtual bool compileShader(gpu::Shader, const ShaderSource& src) override;
+    virtual gpu::Shader create_shader(gpu::ShaderType type) override;
+    virtual gpu::ShaderProgram create_shaderProgram() override;
+    virtual void delete_shader(gpu::Shader shader) override;
+    virtual bool compile_shader(gpu::Shader, const ShaderSource& src) override;
     virtual void bind(gpu::ShaderProgram s) override;
     virtual void unbind(gpu::ShaderProgram s) override;
-    virtual void attachShader(gpu::ShaderProgram p, gpu::Shader s) override;
-    virtual bool linkShaderProgram(gpu::ShaderProgram p) override;
-    virtual bool bindAttributeLocation(gpu::ShaderProgram p,
+    virtual void attach_shader(gpu::ShaderProgram p, gpu::Shader s) override;
+    virtual bool link_shader_program(gpu::ShaderProgram p) override;
+    virtual bool bind_attribute_location(gpu::ShaderProgram p,
                                        int location,
                                        const char* name) override;
-    virtual void sendUniform(int location, float val) override;
-    virtual void sendUniform(int location, const glm::vec2& val) override;
-    virtual void sendUniform(int location, const glm::vec3& val) override;
-    virtual void sendUniform(int location, const glm::vec4& val) override;
-    virtual void sendUniform(int location, const glm::mat4& val) override;
-    virtual void sendUniform(int location, int texUnit,
+    virtual void send_unirform(int location, float val) override;
+    virtual void send_unirform(int location, const glm::vec2& val) override;
+    virtual void send_unirform(int location, const glm::vec3& val) override;
+    virtual void send_unirform(int location, const glm::vec4& val) override;
+    virtual void send_unirform(int location, const glm::mat4& val) override;
+    virtual void send_unirform(int location, int texUnit,
                              const Texture& tex) override;
 
-    virtual int getUniformLocation(const ShaderProgram& p, const char* name) override;
+    virtual int get_uniform_location(const ShaderProgram& p, const char* name) override;
 
-    virtual void drawArrays(gpu::DrawMode mode, int first, int count) override;
+    virtual void draw_arrays(gpu::DrawMode mode, int first, int count) override;
 
-    virtual bool isSupported(gpu::Feature feature) override;
-    virtual bool isSupported(const char* str) override;
-    virtual void makeCurrent() override;
+    virtual bool is_supported(gpu::Feature feature) override;
+    virtual bool is_supported(const char* str) override;
+    virtual void make_current() override;
 };
 
 static const char* glErrorToStr(GLenum err) {
@@ -200,13 +200,13 @@ static GLuint textureUnit(int i)
     return GL_TEXTURE0;
 }
 
-void RenderingContextGLES2::setViewport(int x, int y, int w, int h)
+void RenderingContextGLES2::set_viewport(int x, int y, int w, int h)
 {
     glViewport(x, y, w, h);
     CHECK_GL_ERROR
 }
 
-void RenderingContextGLES2::setClearColor(float r, float g, float b, float a)
+void RenderingContextGLES2::set_clear_color(float r, float g, float b, float a)
 {
     glClearColor(r, g, b, a);
     CHECK_GL_ERROR
@@ -224,13 +224,13 @@ void RenderingContextGLES2::upload(const gpu::VertexBuffer& vbo, Range<byte> dat
   CHECK_GL_ERROR
 }
 
-gpu::VertexArray RenderingContextGLES2::createVertexArray()
+gpu::VertexArray RenderingContextGLES2::create_vertex_array()
 {
     // TODO: VAO not supported in GLES2
     return VertexArray(0);
 }
 
-void RenderingContextGLES2::deleteVertexArray(gpu::VertexArray& vao)
+void RenderingContextGLES2::delete_vertex_array(gpu::VertexArray& vao)
 {
     // TODO: VAO not supported in GLES2
 }
@@ -245,7 +245,7 @@ void RenderingContextGLES2::unbind(const VertexArray& vao)
     // TODO: VAO not supported in GLES2
 }
 
-gpu::VertexBuffer RenderingContextGLES2::createVertexBuffer()
+gpu::VertexBuffer RenderingContextGLES2::create_vertex_buffer()
 {
     GLuint gl_vbo = 0;
     glGenBuffers(1, &gl_vbo);
@@ -253,7 +253,7 @@ gpu::VertexBuffer RenderingContextGLES2::createVertexBuffer()
     return VertexBuffer(gpu::STATIC_UPDATE, gl_vbo);
 }
 
-void RenderingContextGLES2::deleteVertexBuffer(gpu::VertexBuffer& vbo)
+void RenderingContextGLES2::delete_vertex_buffer(gpu::VertexBuffer& vbo)
 {
     GLuint gl_vbo = vbo.handle;
     glDeleteBuffers(1, &gl_vbo);
@@ -272,7 +272,7 @@ void RenderingContextGLES2::unbind(const VertexBuffer& vbo)
     CHECK_GL_ERROR
 }
 
-void RenderingContextGLES2::defineVertexAttribute(int attribIndex,
+void RenderingContextGLES2::define_vertex_attribute(int attribIndex,
                                                gpu::AttributeType type,
                                                int compPerVertex,
                                                int stride,
@@ -288,20 +288,20 @@ void RenderingContextGLES2::defineVertexAttribute(int attribIndex,
     CHECK_GL_ERROR
 }
 
-void RenderingContextGLES2::enableVertexAttribute(int index)
+void RenderingContextGLES2::enable_vertex_attribute(int index)
 {
     glEnableVertexAttribArray(index);
     CHECK_GL_ERROR
 }
 
-void RenderingContextGLES2::disableVertexAttribute(int index)
+void RenderingContextGLES2::disable_vertex_attribute(int index)
 {
     glDisableVertexAttribArray(index);
     CHECK_GL_ERROR
 }
 
 
-gpu::Texture RenderingContextGLES2::createTexture(gpu::UpdateHint hint)
+gpu::Texture RenderingContextGLES2::create_texture(gpu::UpdateHint hint)
 {
     GLuint gl_tex;
     glGenTextures(1, &gl_tex);
@@ -316,7 +316,7 @@ gpu::Texture RenderingContextGLES2::createTexture(gpu::UpdateHint hint)
     return gpu::Texture(gl_tex);
 }
 
-void RenderingContextGLES2::deleteTexture(gpu::Texture texture)
+void RenderingContextGLES2::delete_texture(gpu::Texture texture)
 {
     GLuint gl_tex = (GLuint)texture.handle;
     glDeleteTextures(1, &gl_tex);
@@ -336,7 +336,7 @@ void RenderingContextGLES2::unbind(gpu::Texture tex)
     CHECK_GL_ERROR
 }
 
-void RenderingContextGLES2::setTextureFlags(gpu::Texture tex, TextureFlags flags)
+void RenderingContextGLES2::set_texture_flags(gpu::Texture tex, TextureFlags flags)
 {
     // TODO
     CHECK_GL_ERROR
@@ -347,34 +347,34 @@ void RenderingContextGLES2::upload(gpu::Texture dest, gfx::Surface* src, UploadF
     ScopedBind<Texture> bind(this, dest);
     glTexImage2D(
         GL_TEXTURE_2D, 0, GL_RGBA,
-        src->getSize().width, src->getSize().height,
+        src->get_size().width, src->get_size().height,
         0,
-        GL_RGBA, GL_UNSIGNED_BYTE, src->getData()
+        GL_RGBA, GL_UNSIGNED_BYTE, src->get_data()
     );
     CHECK_GL_ERROR
 }
 
-gpu::Shader RenderingContextGLES2::createShader(gpu::ShaderType type)
+gpu::Shader RenderingContextGLES2::create_shader(gpu::ShaderType type)
 {
     Shader s(glCreateShader(toGL(type)));
     CHECK_GL_ERROR
     return s;
 }
 
-gpu::ShaderProgram RenderingContextGLES2::createShaderProgram()
+gpu::ShaderProgram RenderingContextGLES2::create_shaderProgram()
 {
     ShaderProgram sp(glCreateProgram());
     CHECK_GL_ERROR
     return sp;
 }
 
-void RenderingContextGLES2::deleteShader(gpu::Shader shader)
+void RenderingContextGLES2::delete_shader(gpu::Shader shader)
 {
     glDeleteShader(shader.handle);
     CHECK_GL_ERROR
 }
 
-bool RenderingContextGLES2::compileShader(gpu::Shader shader, const ShaderSource& src)
+bool RenderingContextGLES2::compile_shader(gpu::Shader shader, const ShaderSource& src)
 {
     glShaderSource(shader.handle, src.count, src.str, src.len);
     CHECK_GL_ERROR
@@ -411,13 +411,13 @@ void RenderingContextGLES2::unbind(gpu::ShaderProgram shader)
     CHECK_GL_ERROR
 }
 
-void RenderingContextGLES2::attachShader(gpu::ShaderProgram p, gpu::Shader s)
+void RenderingContextGLES2::attach_shader(gpu::ShaderProgram p, gpu::Shader s)
 {
     glAttachShader(p.handle, s.handle);
     CHECK_GL_ERROR
 }
 
-bool RenderingContextGLES2::linkShaderProgram(gpu::ShaderProgram p)
+bool RenderingContextGLES2::link_shader_program(gpu::ShaderProgram p)
 {
     glLinkProgram(p.handle);
     CHECK_GL_ERROR
@@ -441,7 +441,7 @@ bool RenderingContextGLES2::linkShaderProgram(gpu::ShaderProgram p)
     return true;
 }
 
-bool RenderingContextGLES2::bindAttributeLocation(gpu::ShaderProgram p,
+bool RenderingContextGLES2::bind_attribute_location(gpu::ShaderProgram p,
                                                int location,
                                                const char* name)
 {
@@ -449,28 +449,28 @@ bool RenderingContextGLES2::bindAttributeLocation(gpu::ShaderProgram p,
     CHECK_GL_ERROR
 }
 
-void RenderingContextGLES2::sendUniform(int location, float val)
+void RenderingContextGLES2::send_unirform(int location, float val)
 {
     glUniform1f(location, val);
 }
-void RenderingContextGLES2::sendUniform(int location, const glm::vec2& val)
+void RenderingContextGLES2::send_unirform(int location, const glm::vec2& val)
 {
     glUniform2f(location, val[0], val[1]);
 }
-void RenderingContextGLES2::sendUniform(int location, const glm::vec3& val)
+void RenderingContextGLES2::send_unirform(int location, const glm::vec3& val)
 {
     glUniform3f(location, val[0], val[1], val[2]);
 }
-void RenderingContextGLES2::sendUniform(int location, const glm::vec4& val)
+void RenderingContextGLES2::send_unirform(int location, const glm::vec4& val)
 {
     glUniform4f(location, val[0], val[1], val[2], val[3]);
 }
-void RenderingContextGLES2::sendUniform(int location, const glm::mat4& val)
+void RenderingContextGLES2::send_unirform(int location, const glm::mat4& val)
 {
     glUniformMatrix4fv(location, 1, GL_FALSE, &val[0][0]);
 }
 
-void RenderingContextGLES2::sendUniform(int location,
+void RenderingContextGLES2::send_unirform(int location,
                                      int texUnit,
                                      const Texture& tex)
 {
@@ -480,27 +480,27 @@ void RenderingContextGLES2::sendUniform(int location,
 }
 
 
-int RenderingContextGLES2::getUniformLocation(const ShaderProgram& p, const char* name)
+int RenderingContextGLES2::get_uniform_location(const ShaderProgram& p, const char* name)
 {
     return glGetUniformLocation(p.handle, name);
 }
 
 
-void RenderingContextGLES2::drawArrays(gpu::DrawMode mode, int first, int count)
+void RenderingContextGLES2::draw_arrays(gpu::DrawMode mode, int first, int count)
 {
     glDrawArrays(toGL(mode), first, count);
     CHECK_GL_ERROR
 }
 
 
-bool RenderingContextGLES2::isSupported(const char* str)
+bool RenderingContextGLES2::is_supported(const char* str)
 {
     return false;
 //    return glewIsSupported(str);
 //    CHECK_GL_ERROR
 }
 
-bool RenderingContextGLES2::isSupported(gpu::Feature feature)
+bool RenderingContextGLES2::is_supported(gpu::Feature feature)
 {
     switch (feature) {
         case gpu::FRAGMENT_SHADING: return true;
@@ -511,7 +511,7 @@ bool RenderingContextGLES2::isSupported(gpu::Feature feature)
     }
 }
 
-void RenderingContextGLES2::makeCurrent()
+void RenderingContextGLES2::make_current()
 {
     CHECK_GL_ERROR
 }

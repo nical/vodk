@@ -11,10 +11,10 @@ namespace vodk {
 class EntityManager
 {
 public:
-    EntityID addEntity();
+    EntityID add_entity();
     const Entity* getEntity(EntityID id);
     void markDestroyed(EntityID id);
-    uint32_t getNumberOfEntities() const;
+    uint32_t get_numberOfEntities() const;
     uint32_t getAllocatedSize() const; // in bytes
 
     void applyDestroyed();

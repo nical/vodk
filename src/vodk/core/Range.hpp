@@ -17,8 +17,8 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef KIWI_UTILS_SLICE_HPP
-#define KIWI_UTILS_SLICE_HPP
+#ifndef KIWI_UTILS_RANGE_HPP
+#define KIWI_UTILS_RANGE_HPP
 
 #include <stdint.h>
 #include <assert.h>
@@ -72,16 +72,16 @@ public:
     /**
      * returns true if this is not an empty range.
      */
-    bool isValid() const {
+    bool is_valid() const {
         return _start <= _end && _start != nullptr;
     }
 
-    void shrinkLeft(uint32_t num) {
+    void shrink_left(uint32_t num) {
         _start += num;
         assert (_start <= _end);
     }
 
-    void shrinkRight(uint32_t num) {
+    void shrink_right(uint32_t num) {
         _end -= num;
         assert (_start <= _end);
     }
@@ -92,11 +92,11 @@ public:
 
     Self next() const {
         Self s = *this;
-        s.shrinkLeft();
+        s.shrink_left();
         return s;
     }
 
-    bool hasNext() const {
+    bool has_next() const {
         return !next().empty();
     }
 
@@ -188,16 +188,16 @@ public:
         return _range.contains(s._range);
     }
 
-    bool isValid() {
-        return _range.isValid();
+    bool is_valid() {
+        return _range.is_valid();
     }
 
-    void shrinkLeft(uint32_t num) {
-        _range.shrinkLeft(num*_step);
+    void shrink_left(uint32_t num) {
+        _range.shrink_left(num*_step);
     }
 
-    void shrinkRight(uint32_t num) {
-        _range.shrinkRight(num*_step);
+    void shrink_right(uint32_t num) {
+        _range.shrink_right(num*_step);
     }
 
     Range<uint8_t> bytes() {
@@ -206,15 +206,15 @@ public:
 
     Self next() const {
         Self s = *this;
-        s.shrinkLeft(1);
+        s.shrink_left(1);
         return s;
     }
 
-    bool isValid() const {
-        return _range.isValid();
+    bool is_valid() const {
+        return _range.is_valid();
     }
 
-    bool hasNext() const {
+    bool has_next() const {
         return !next().empty();
     }
 
@@ -234,13 +234,13 @@ public:
 
     void* pop_front() {
         void* start = _range._start;
-        shrinkLeft(1);
+        shrink_left(1);
         return start;
     }
 
     void* pop_back() {
         void* end = _range._end;
-        shrinkRight(1);
+        shrink_right(1);
         return end;
     }
 private:

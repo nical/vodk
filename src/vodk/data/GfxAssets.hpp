@@ -43,17 +43,17 @@ public:
     : Asset(mgr)
     {
         _path = url;
-        setState(Asset::State::LOADED);
+        set_state(Asset::State::LOADED);
     }
 
-    virtual AssetType getType() override {
+    virtual AssetType get_type() override {
         return STRING_ASSET;
     }
 
     virtual bool load() override {}
     virtual void unload() override {}
 
-    std::string& getString() {
+    std::string& get_string() {
         return _path;
     }
 protected:
@@ -66,14 +66,14 @@ public:
     static const AssetType Type = IMAGE_ASSET;
     ImageAsset(AssetManager* mgr, const char* path);
 
-    virtual AssetType getType() override {
+    virtual AssetType get_type() override {
         return IMAGE_ASSET;
     }
 
     virtual bool load() override;
     virtual void unload() override;
 
-    gfx::ImageSurface* getImage() {
+    gfx::ImageSurface* get_image() {
         return _img;
     }
 protected:
@@ -87,17 +87,17 @@ public:
     static const AssetType Type = TEXTURE_ASSET;
     TextureAsset(AssetManager* mgr, gpu::RenderingContext* rc, ImageAsset* dep);
 
-    virtual AssetType getType() override {
+    virtual AssetType get_type() override {
         return TEXTURE_ASSET;
     }
 
     virtual bool load() override;
     virtual void unload() override;
 
-    gpu::Texture& getTexture() {
+    gpu::Texture& get_texture() {
         return _tex;
     }
-    gpu::RenderingContext* getRenderingContext() {
+    gpu::RenderingContext* get_rendering_context() {
         return _ctx;
     }
 protected:
@@ -112,11 +112,11 @@ public:
     ShaderAsset(AssetManager* mgr, gpu::RenderingContext* rc, gpu::ShaderType type, StringAsset* dep)
     : Asset(mgr), _ctx(rc), _type(type)
     {
-        if (!addDependency(dep)) { assert(false); }
-        _shader = _ctx->createShader(type);
+        if (!add_dependency(dep)) { assert(false); }
+        _shader = _ctx->create_shader(type);
     }
 
-    virtual AssetType getType() override {
+    virtual AssetType get_type() override {
         return SHADER_ASSET;
     }
 
@@ -124,7 +124,7 @@ public:
     virtual void unload() override;
 
 
-    gpu::Shader& getShader() {
+    gpu::Shader& get_shader() {
         return _shader;
     }
 
@@ -141,19 +141,19 @@ public:
     ShaderProgramAsset(AssetManager* mgr, gpu::RenderingContext* rc, ShaderAsset* vs, ShaderAsset* fs)
     : Asset(mgr), _ctx(rc)
     {
-        if (!addDependency(vs, 0)) { assert(false); }
-        if (!addDependency(fs, 1)) { assert(false); }
-        _program = _ctx->createShaderProgram();
+        if (!add_dependency(vs, 0)) { assert(false); }
+        if (!add_dependency(fs, 1)) { assert(false); }
+        _program = _ctx->create_shaderProgram();
     }
 
-    virtual AssetType getType() override {
+    virtual AssetType get_type() override {
         return SHADER_PROGRAM_ASSET;
     }
 
     virtual bool load() override;
     virtual void unload() override;
 
-    gpu::ShaderProgram& getShaderProgram() {
+    gpu::ShaderProgram& get_shader_program() {
         return _program;
     }
 

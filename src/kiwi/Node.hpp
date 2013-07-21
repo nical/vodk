@@ -53,7 +53,7 @@ public:
         }
         return LinkIterator(i, _end, _inIndex, _outIndex);
     }
-    const Link* getLink() {
+    const Link* get_link() {
         return *_start;
     }
     const Link& operator*() {
@@ -72,18 +72,18 @@ protected:
 class ConnectedNodeIterator : public LinkIterator
 {
 public:
-    const Node* getNode() {
+    const Node* get_node() {
         switch (_direction) {
-            case INPUT: return getLink() ? getLink()->inputNode : nullptr;
-            case OUTPUT: return getLink() ? getLink()->outputNode : nullptr;
+            case INPUT: return get_link() ? get_link()->inputNode : nullptr;
+            case OUTPUT: return get_link() ? get_link()->outputNode : nullptr;
         }
         return nullptr;
     }
     const Node& operator*() {
-        return *getNode();
+        return *get_node();
     }
     const Node* operator->() {
-        return getNode();
+        return get_node();
     }
 protected:
     kiwi::Direction _direction;
@@ -111,14 +111,14 @@ public:
         return LinkIterator(&_outputs[0], &_outputs[_outputs.size()-1], NO_FILTER, filter);
     }
 
-    PortIndex getInputCount() { return _inputs.size(); }
-    PortIndex getOutputCount() { return _outputs.size(); }
-    virtual PortTypeID getInputTypeID(PortIndex) { return 0; }
-    virtual PortTypeID getOutputTypeID(PortIndex) { return 0; }
+    PortIndex num_inputs() { return _inputs.size(); }
+    PortIndex num_outputs() { return _outputs.size(); }
+    virtual PortTypeID get_input_typeid(PortIndex) { return 0; }
+    virtual PortTypeID get_output_typeid(PortIndex) { return 0; }
 
-    NodeTypeID getTypeID() const { return _typeID; }
+    NodeTypeID get_typeid() const { return _typeID; }
 
-    Graph* getGraph() { return _graph; }
+    Graph* get_graph() { return _graph; }
 
 private:
     std::vector<Link*> _inputs;
@@ -138,7 +138,7 @@ class Graph {
 public:
     virtual bool connect(Node& n1, PortIndex p1,
                         Node& n2, PortIndex p2);
-    virtual bool areConnected(Node& n1, PortIndex p1,
+    virtual bool are_connected(Node& n1, PortIndex p1,
                              Node& n2, PortIndex p2);
     virtual bool disconnect(const Link* l);
 

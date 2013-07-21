@@ -36,13 +36,13 @@ class ImageSurfaceSFML : public sf::Image
 public:
 
     // Surface
-    virtual SurfaceFormat getFormat() const override { return gfx::SURFACE_R8G8B8A8; }
-    virtual const byte* getData(int bufIndex = 0) const override { return getPixelsPtr(); }
-    virtual IntSize getSize() const override {
-        return IntSize(sf::Image::getSize().x, sf::Image::getSize().y);
+    virtual SurfaceFormat get_format() const override { return gfx::SURFACE_R8G8B8A8; }
+    virtual const byte* get_data(int bufIndex = 0) const override { return getPixelsPtr(); }
+    virtual IntSize get_size() const override {
+        return IntSize(sf::Image::get_size().x, sf::Image::get_size().y);
     }
-    virtual int getStride() const override { return getSize().width * 4; } 
-    virtual int getSkip() const override { return 0; }
+    virtual int get_stride() const override { return get_size().width * 4; } 
+    virtual int get_skip() const override { return 0; }
 };
 
 #endif
@@ -63,16 +63,16 @@ public:
     void deallocate();
 
     // Surface
-    virtual SurfaceFormat getFormat() const override { return gfx::SURFACE_R8G8B8A8; }
+    virtual SurfaceFormat get_format() const override { return gfx::SURFACE_R8G8B8A8; }
 
-    virtual const byte* getData(int bufIndex = 0) const override { return _data; }
-    byte* getData(int bufIndex = 0) { return _data; }
+    virtual const byte* get_data(int bufIndex = 0) const override { return _data; }
+    byte* get_data(int bufIndex = 0) { return _data; }
 
-    virtual IntSize getSize() const override {
+    virtual IntSize get_size() const override {
         return _size;
     }
-    virtual int getStride() const override { return _stride; } 
-    virtual int getSkip() const override { return _skip; }
+    virtual int get_stride() const override { return _stride; } 
+    virtual int get_skip() const override { return _skip; }
 
 protected:
     byte* _data;

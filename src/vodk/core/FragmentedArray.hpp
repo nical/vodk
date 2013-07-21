@@ -21,7 +21,7 @@ private:
     };
 
 public:
-    uint32_t getSize() const {
+    uint32_t get_size() const {
         Chunk* it = _firstChunk;
         uint32_t size = 0;
         while (it && (it->_next != nullptr) && (it->_size == N)) {
@@ -106,11 +106,11 @@ public:
             return Range<T>(_current->_data, _current->_data + _current->_size);
         }
 
-        bool hasNext() const {
+        bool has_next() const {
             return _current && _current->_next != nullptr;
         }
 
-        bool isValid() const {
+        bool is_valid() const {
             return _current;
         }
     private:

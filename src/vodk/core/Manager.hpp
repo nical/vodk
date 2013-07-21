@@ -25,7 +25,7 @@ protected:
     ObjectIDType add(const ObjectType& toCopy)
     {
         Container::ChunkIterator it = _data.chunks();
-        while (it.isValid()) {
+        while (it.is_valid()) {
             auto elts = it.slice();
             for (uint32_t i = 0; i < elts.size(); ++i) {
                 // TODO freelist
@@ -37,12 +37,12 @@ protected:
             it = it.next();
         }
         _data.pushBack(Entity()).reset(ENTITY_STATE_NORMAL);
-        return EntityID(_data.getSize() - 1, _genHash++);
+        return EntityID(_data.get_size() - 1, _genHash++);
     }
 
     T* get(ObjectIDType id)
     {
-        if (id.index >= _data.getSize()) {
+        if (id.index >= _data.get_size()) {
             return nullptr;
         }
 
@@ -55,8 +55,8 @@ protected:
         return obj;
     }
 
-    uint32_t getSize() const {
-        return _data.getSize();
+    uint32_t get_size() const {
+        return _data.get_size();
     }
 
     virtual ~Manager() {}

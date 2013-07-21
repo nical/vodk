@@ -22,7 +22,7 @@
 
 namespace vodk {
 
-EntityID Scope::addEntity(EntityDescriptor& desc) {
+EntityID Scope::add_entity(EntityDescriptor& desc) {
     EntityOffset idx = 0;
 
     while (idx != _entities.size() && _entities[idx].state != ENTITY_STATE_NORMAL) {
@@ -40,19 +40,19 @@ EntityID Scope::addEntity(EntityDescriptor& desc) {
     e.genHash = _genHash;
     for (unsigned i = 0; i < desc.components.size(); ++i) {
         e.components[i].subSystem = desc.components[i];
-        e.components[i].offset = getSubsystem(desc.components[i])->add(idx);
+        e.components[i].offset = get_subsystem(desc.components[i])->add(idx);
     }
 
     return EntityID(idx, _scopeID);
 }
 
-void Scope::markEntityDestroyed(EntityID aID) {
-    assert(containsEntity(aID));
+void Scope::mark_entity_detroyed(EntityID aID) {
+    assert(contains_entity(aID));
     _entities[aID.offset].state = ENTITY_STATE_DESTROYED;
 }
 
-void Scope::removeEntity(EntityID aID) {
-    assert(containsEntity(aID));
+void Scope::remove_entity(EntityID aID) {
+    assert(contains_entity(aID));
 
     Entity& e = _entities[aID.offset];
 
@@ -67,22 +67,22 @@ void Scope::removeEntity(EntityID aID) {
     }
 }
 
-bool Scope::containsEntity(EntityID id) {
+bool Scope::contains_entity(EntityID id) {
     return id.offset < _entities.size()
            && _entities[id.offset].state == ENTITY_STATE_NORMAL;
 }
 
-gfx::Transform& Scope::getTransform(EntityID id) {
+gfx::Transform& Scope::get_transform(EntityID id) {
     _entities[id.offset].transform;
 }
 
-void Scope::addSubSystem(SubSystem* toAdd) {
+void Scope::add_subsystem(SubSystem* toAdd) {
     assert(toAdd);
     assert(!_subSystems[toAdd->id()]);
     _subSystems[toAdd->id()] = toAdd;
 }
 
-SubSystem* Scope::getSubsystem(SubSystemID id) {
+SubSystem* Scope::get_subsystem(SubSystemID id) {
     assert(id < SYSTEM_COUNT);
     return _subSystems[id];
 }

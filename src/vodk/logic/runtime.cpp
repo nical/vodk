@@ -30,10 +30,10 @@ void eval(ASTNode* node, RuntimeContext* ctx)
 
 	switch (node->type()) {
 		case AST_CONDITION: {
-			ConditionASTNode* cond = node->AsCondition();
+			ConditionASTNode* cond = node->as_condition();
 			void* params[4];
-			for (unsigned i = 0; i < cond->nParams(); ++i) {
-				params[i] = ctx->params[cond->paramRegister(i)];
+			for (unsigned i = 0; i < cond->num_params(); ++i) {
+				params[i] = ctx->params[cond->param_registers(i)];
 			}
 			bool res = cond->evaluate(params);
 			if (res && cond->then) {
@@ -44,16 +44,16 @@ void eval(ASTNode* node, RuntimeContext* ctx)
 			break;
 		}
 		case AST_ACTION: {
-			ActionASTNode* act = node->AsAction();
+			ActionASTNode* act = node->as_action();
 			void* params[4];
-			for (unsigned i = 0; i < act->nParams(); ++i) {
-				params[i] = ctx->params[act->paramRegister(i)];
+			for (unsigned i = 0; i < act->num_params(); ++i) {
+				params[i] = ctx->params[act->param_registers(i)];
 			}
 			act->run(params);
 			break;
 		}
 		case AST_ITERATE: {
-			IteratorASTNode* n = node->AsIterator();
+			IteratorASTNode* n = node->as_iterator();
 			Range<Entity> entities = ctx->entities;
 			for (unsigned i = 0; i < entities.size(); ++i) {
 				if (n->child) {

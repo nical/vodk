@@ -7,10 +7,10 @@ namespace kiwi {
 bool Graph::connect(Node& n1, PortIndex p1,
                    Node& n2, PortIndex p2)
 {
-    if (n1.getGraph() != this || n2.getGraph() != this) {
+    if (n1.get_graph() != this || n2.get_graph() != this) {
         return false;
     }
-    if (areConnected(n1,p1,n2,p2)) {
+    if (are_connected(n1,p1,n2,p2)) {
         return true;
     }
     Link* l = new Link(&n1, &n2, p1, p2);
@@ -19,7 +19,7 @@ bool Graph::connect(Node& n1, PortIndex p1,
     return true;
 }
 
-bool Graph::areConnected(Node& n1, PortIndex p1,
+bool Graph::are_connected(Node& n1, PortIndex p1,
                         Node& n2, PortIndex p2)
 {
     LinkIterator it = n1.outputConnections(p1);

@@ -35,22 +35,22 @@ public:
     bool parse(const std::string& src);
     bool parse(const char* src, int nChars);
     void reset();
-    bool isFinished() const;
+    bool is_finished() const;
 protected:
-    virtual void onObjectStart(const json::Node*) {}
-    virtual void onObjectEnd(const  json::Node*) {}
-    virtual void onArrayStart(const json::Node*) {}
-    virtual void onArrayEnd(const json::Node*) {}
-    virtual void onValue(const json::Node*) {}
-    virtual void onError(json::Error err);
-    virtual void onReset() {}
+    virtual void on_object_start(const json::Node*) {}
+    virtual void on_object_end(const  json::Node*) {}
+    virtual void on_array_start(const json::Node*) {}
+    virtual void on_array_end(const json::Node*) {}
+    virtual void on_value(const json::Node*) {}
+    virtual void on_error(json::Error err);
+    virtual void on_reset() {}
 
     void abort();
 
 private:
-    bool isInArray() const;
-    bool isInObject() const;
-    void popNode();
+    bool is_in_array() const;
+    bool is_in_Object() const;
+    void pop_node();
 
     json::Node* _currentNode;
     std::string _currentName;
@@ -62,31 +62,31 @@ private:
 
 class Node {
 public:
-    json::Type getType() const {return _type; }
-    const std::string& getName() const { return _name; }
-    const int getIndex() const { return _index; }
-    uint64_t getID() const { return _id; }
+    json::Type get_type() const {return _type; }
+    const std::string& get_name() const { return _name; }
+    const int get_index() const { return _index; }
+    uint64_t get_id() const { return _id; }
 
     const Node* getParent() const { return _parent; }
-    bool isInArray() const { return _parent ? _parent->_type == TYPE_ARRAY : false; }
-    bool isInObject() const { return _parent ? _parent->_type == TYPE_OBJECT : false; }
-    int getDepth() const { return _parent ? _parent->getDepth() + 1 : 0; }
+    bool is_in_array() const { return _parent ? _parent->_type == TYPE_ARRAY : false; }
+    bool is_in_Object() const { return _parent ? _parent->_type == TYPE_OBJECT : false; }
+    int get_depth() const { return _parent ? _parent->get_depth() + 1 : 0; }
 
-    bool isBoolean() const { return _type == TYPE_BOOLEAN; }
-    bool isNumber() const { return _type == TYPE_NUMBER; }
-    bool isString() const { return _type == TYPE_STRING; }
-    bool isNull() const { return _type == TYPE_NULL; }
+    bool is_boolean() const { return _type == TYPE_BOOLEAN; }
+    bool is_number() const { return _type == TYPE_NUMBER; }
+    bool is_string() const { return _type == TYPE_STRING; }
+    bool is_null() const { return _type == TYPE_NULL; }
 
-    const bool getBoolean() const {
-        assert(isBoolean());
+    const bool get_boolean() const {
+        assert(is_boolean());
         return _boolean;
     }
-    const double getNumber() const {
-        assert(isNumber());
+    const double get_number() const {
+        assert(is_number());
         return _number;
     }
-    const std::string& getString() const {
-        assert(isString());
+    const std::string& get_string() const {
+        assert(is_string());
         return _str;
     }
 
@@ -110,7 +110,7 @@ protected:
     friend class Parser;
 };
 
-bool readNumber(const char* src, int maxChars, int* nCharsRead);
+bool read_number(const char* src, int maxChars, int* nCharsRead);
 
 
 } // json

@@ -45,9 +45,9 @@ public:
     float rz;
 
     glm::mat4 matrix() const;
-    glm::mat4 rotationMatrix() const;
-    glm::mat4 translationMatrix() const;
-    glm::mat4 scaleMatrix() const;
+    glm::mat4 rotation_matrix() const;
+    glm::mat4 translation_matrix() const;
+    glm::mat4 scale_matrix() const;
     glm::vec3 vec3() const;
     glm::vec4 vec4() const;
 

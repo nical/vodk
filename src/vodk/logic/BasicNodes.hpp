@@ -48,9 +48,9 @@ public:
 		regs[1] = p1;
 	}
 
-	virtual uint8_t nParams() override { return 2; }
+	virtual uint8_t num_params() override { return 2; }
 
-	virtual ASTRegister paramRegister(uint8_t p) override { return regs[p]; }
+	virtual ASTRegister param_registers(uint8_t p) override { return regs[p]; }
 
 	virtual bool evaluate(void* args) override {
 		printf("compare ? %p, %p\n", ((void**)args)[0], ((void**)args)[1]);

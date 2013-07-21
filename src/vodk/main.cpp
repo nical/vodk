@@ -33,7 +33,7 @@ Scope* scope;
 bool mainLoop() {
     printf("mainLoop\n");
     io::Window::Event event;
-    while (window->pollEvent(event)) {
+    while (window->poll_events(event)) {
         if (event.type == io::Window::Event::Closed) {
             return false;
         }
@@ -44,11 +44,11 @@ bool mainLoop() {
     glm::mat4 model_view(1.0);
     glm::mat4 transform(1.0);
 /*
-    gpu::ShaderProgram p = program_asset->getShaderProgram();
+    gpu::ShaderProgram p = program_asset->get_shader_program();
     ctx->bind(p);
-    ctx->sendUniform(ctx->getUniformLocation(p, "in_Texture"), 0, texture_asset->getTexture());
-    ctx->sendUniform(ctx->getUniformLocation(p, "in_ModelView"), model_view);
-    ctx->sendUniform(ctx->getUniformLocation(p, "in_Transform"), transform);
+    ctx->send_unirform(ctx->get_uniform_location(p, "in_Texture"), 0, texture_asset->get_texture());
+    ctx->send_unirform(ctx->get_uniform_location(p, "in_ModelView"), model_view);
+    ctx->send_unirform(ctx->get_uniform_location(p, "in_Transform"), transform);
     gpu::drawUnitQuad(ctx);
 */
     gfxComponents->render(16.0);
@@ -69,16 +69,16 @@ int main()
 
     // create the window
     window = new io::Window(480, 320, "Vodk");
-    ctx = window->getRenderingContext();
+    ctx = window->get_rendering_context();
     gpu::initQuad(ctx);
     data::InitImageAssetManager();
-    ctx->setViewport(0,0,480,320);
+    ctx->set_viewport(0,0,480,320);
 
     scope = new Scope;
 
-    assert(ctx->isSupported(gpu::FRAGMENT_SHADING));
+    assert(ctx->is_supported(gpu::FRAGMENT_SHADING));
 
-    ctx->setClearColor(1.0, 0.5, 0.0, 1.0);
+    ctx->set_clear_color(1.0, 0.5, 0.0, 1.0);
 
     data::AssetManager mgr;
 

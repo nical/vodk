@@ -10,32 +10,32 @@ bool test_FragmentedArray() {
     printf("Begin test - vodk::FragmentedArray\n");
     FragmentedArray<int,8> a;
 
-    assert(a.getSize() == 0);
+    assert(a.get_size() == 0);
     assert(a.getCapacity() == 0);
 
 
     for (int i = 0; i < 100; ++i) {
         a.pushBack(i);
-        assert(a.getSize() == i+1);
+        assert(a.get_size() == i+1);
     }
     for (int i = 0; i < 100; ++i) {
         assert(a.at(i) == i);
     }
-    assert(a.getSize() == 100);
+    assert(a.get_size() == 100);
     assert(a.getCapacity() >= 100);
 
     a.clear();
 
-    assert(a.getSize() == 0);
+    assert(a.get_size() == 0);
 
     for (int i = 0; i < 100; ++i) {
         a.pushBack(i);
-        assert(a.getSize() == i+1);
+        assert(a.get_size() == i+1);
     }
     for (int i = 0; i < 100; ++i) {
         assert(a.at(i) == i);
     }
-    assert(a.getSize() == 100);
+    assert(a.get_size() == 100);
     assert(a.getCapacity() >= 100);
 
     printf("End test - vodk::FragmentedArray\n");

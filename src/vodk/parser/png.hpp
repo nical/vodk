@@ -19,14 +19,14 @@ public:
     PNGImage();
     ~PNGImage();
 
-    bool loadFromFile(const char* path);
-    bool saveToFile(const char* path);
+    bool load_from_file(const char* path);
+    bool save_to_file(const char* path);
 
-    gfx::IntSize getSize() const {
+    gfx::IntSize get_size() const {
         return _size;
     }
 
-    bool copyInto(gfx::ImageSurface& surface);
+    bool copy_into(gfx::ImageSurface& surface);
 
 protected:
     gfx::IntSize _size;

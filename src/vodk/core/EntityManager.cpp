@@ -3,10 +3,10 @@
 
 namespace vodk {
 /*
-EntityID EntityManager::addEntity()
+EntityID EntityManager::add_entity()
 {
     EntityContainer::ChunkIterator it = _entities.chunks();
-    while (it.isValid()) {
+    while (it.is_valid()) {
         auto elts = it.slice();
         for (uint32_t i = 0; i < elts.size(); ++i) {
             if (elts[i].state & ENTITY_STATE_EMPTY) {
@@ -17,7 +17,7 @@ EntityID EntityManager::addEntity()
         it = it.next();
     }
     _entities.pushBack(Entity()).reset(ENTITY_STATE_NORMAL);
-    return EntityID(_entities.getSize() - 1, _genHash++);
+    return EntityID(_entities.get_size() - 1, _genHash++);
 }
 
 const Entity* EntityManager::getEntity(EntityID id)
@@ -28,7 +28,7 @@ const Entity* EntityManager::getEntity(EntityID id)
 
 Entity* EntityManager::_getEntity(EntityID id)
 {
-    if (id.index >= _entities.getSize()) {
+    if (id.index >= _entities.get_size()) {
         return nullptr;
     }
 
@@ -52,7 +52,7 @@ void EntityManager::markDestroyed(EntityID id)
 void EntityManager::applyDestroyed()
 {
     EntityContainer::ChunkIterator it = _entities.chunks();
-    while (it.isValid()) {
+    while (it.is_valid()) {
         auto elts = it.slice();
         for (uint32_t i = 0; i < elts.size(); ++i) {
             if (elts[i].state & ENTITY_STATE_DESTROYED) {
@@ -64,9 +64,9 @@ void EntityManager::applyDestroyed()
     }
 }
 
-uint32_t EntityManager::getNumberOfEntities() const
+uint32_t EntityManager::get_numberOfEntities() const
 {
-    return _entities.getSize();
+    return _entities.get_size();
 }
 
 uint32_t EntityManager::getAllocatedSize() const

@@ -44,7 +44,7 @@ PNGImage::~PNGImage()
 png_structp png(void* ptr) { return static_cast<png_structp>(ptr); }
 png_infop png_info(void* ptr) { return static_cast<png_infop>(ptr); }
 
-bool PNGImage::loadFromFile(const char* path)
+bool PNGImage::load_from_file(const char* path)
 {
     uint8_t header[8];    // 8 is the maximum size that can be checked
 
@@ -123,14 +123,14 @@ bool PNGImage::loadFromFile(const char* path)
     return true;
 }
 
-bool PNGImage::copyInto(gfx::ImageSurface& surface)
+bool PNGImage::copy_into(gfx::ImageSurface& surface)
 {
     surface.allocate(_size, gfx::SURFACE_R8G8B8A8);
-    int bpp = gfx::bytesPerPixel(gfx::SURFACE_R8G8B8A8);
-    uint8_t* surf_row = surface.getData(); 
+    int bpp = gfx::bytes_per_pixel(gfx::SURFACE_R8G8B8A8);
+    uint8_t* surf_row = surface.get_data(); 
     for (int i = 0; i < _size.height; ++i) {
         memcpy(surf_row, _rows[i], _size.width * bpp);
-        surf_row += surface.getStride();
+        surf_row += surface.get_stride();
     }
 }
 

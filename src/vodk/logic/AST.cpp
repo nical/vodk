@@ -16,9 +16,9 @@ void ConditionASTNode::dump(uint32_t indent)
 {
 	dumpIndentation(indent);
 	printf("[if] %s(", name());
-	for (unsigned i = 0; i < nParams(); ++i) {
-		printf("%c", paramRegister(i)+'A');
-		if (i+1 < nParams()) {
+	for (unsigned i = 0; i < num_params(); ++i) {
+		printf("%c", param_registers(i)+'A');
+		if (i+1 < num_params()) {
 			printf(", ");
 		}
 	}
@@ -40,9 +40,9 @@ void ActionASTNode::dump(uint32_t indent)
 {
 	dumpIndentation(indent);
 	printf("[action] %s(", name());
-	for (unsigned i = 0; i < nParams(); ++i) {
-		printf("%c", paramRegister(i)+'A');
-		if (i+1 < nParams()) {
+	for (unsigned i = 0; i < num_params(); ++i) {
+		printf("%c", param_registers(i)+'A');
+		if (i+1 < num_params()) {
 			printf(", ");
 		}
 	}

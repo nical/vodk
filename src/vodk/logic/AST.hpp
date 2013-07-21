@@ -28,11 +28,11 @@ public:
 
 	virtual ASTNodeType type() const = 0;
 
-	virtual ConditionASTNode* AsCondition() { return nullptr; }
+	virtual ConditionASTNode* as_condition() { return nullptr; }
 
-	virtual ActionASTNode* AsAction() { return nullptr; }
+	virtual ActionASTNode* as_action() { return nullptr; }
 
-	virtual IteratorASTNode* AsIterator() { return nullptr; }
+	virtual IteratorASTNode* as_iterator() { return nullptr; }
 
 	virtual void dump(uint32_t indent = 0) = 0;
 
@@ -63,7 +63,7 @@ public:
 
 	virtual ASTNodeType type() const override { return AST_CONDITION; };
 
-	virtual ConditionASTNode* AsCondition() override { return this; }
+	virtual ConditionASTNode* as_condition() override { return this; }
 
 	virtual void dump(uint32_t indent = 0) override;
 
@@ -74,11 +74,11 @@ public:
 	/**
 	 * number of arguments
 	 */
-	virtual uint8_t nParams() { return 0; }
+	virtual uint8_t num_params() { return 0; }
 	/**
 	 * what register to fetch for a given argument
 	 */
-	virtual ASTRegister paramRegister(uint8_t param) { return X; };
+	virtual ASTRegister param_registers(uint8_t param) { return X; };
 
 	ASTNode* then;
 	ASTNode* otherwise;
@@ -94,8 +94,8 @@ public:
 	, _reg(reg)
 	{}
 
-	virtual uint8_t nParams() const override { return 1; }
-	virtual uint8_t paramRegister(uint8_t) override { return _reg; }
+	virtual uint8_t num_params() const override { return 1; }
+	virtual uint8_t param_registers(uint8_t) override { return _reg; }
 
 	virtual bool evaluate(void* param) override {
 		return _function(static_cast<T*>(param));
@@ -115,8 +115,8 @@ public:
 	, _reg(reg)
 	{}
 
-	virtual uint8_t nParams() const override { return 2; }
-	virtual uint8_t paramRegister(uint8_t i) override { return _reg[i]; }
+	virtual uint8_t num_params() const override { return 2; }
+	virtual uint8_t param_registers(uint8_t i) override { return _reg[i]; }
 
 	virtual bool evaluate(void* params) override {
 		void** p = (void**)params;
@@ -143,7 +143,7 @@ public:
 
 	virtual ASTNodeType type() const override { return AST_ACTION; };
 
-	virtual ActionASTNode* AsAction() override { return this; }
+	virtual ActionASTNode* as_action() override { return this; }
 
 	virtual void dump(uint32_t indent = 0) override;
 
@@ -154,11 +154,11 @@ public:
 	/**
 	 * number of arguments
 	 */
-	virtual uint8_t nParams() { return 0; }
+	virtual uint8_t num_params() { return 0; }
 	/**
 	 * what register to fetch for a given argument
 	 */
-	virtual ASTRegister paramRegister(uint8_t param) { return X; };
+	virtual ASTRegister param_registers(uint8_t param) { return X; };
 };
 
 /**
@@ -178,7 +178,7 @@ public:
 
 	virtual ASTNodeType type() const override { return AST_ITERATE; };
 
-	virtual IteratorASTNode* AsIterator() override { return this; }
+	virtual IteratorASTNode* as_iterator() override { return this; }
 
 	virtual void dump(uint32_t indent = 0) override;
 
@@ -205,7 +205,7 @@ ASTNode* Not(ConditionASTNode* a, ASTNode* then);
 ASTNode* And(ConditionASTNode* a, ConditionASTNode* b, ASTNode* then);
 ASTNode* Then(ActionASTNode* a);
 
-void MergeTrees(ASTNode* a, ASTNode* b);
+void merge_trees(ASTNode* a, ASTNode* b);
 
 } // ast
 

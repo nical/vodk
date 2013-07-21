@@ -49,19 +49,19 @@ public:
     Scope();
     ~Scope();
 
-    EntityID addEntity(EntityDescriptor& desc);
+    EntityID add_entity(EntityDescriptor& desc);
 
-    void removeEntity(EntityID id);
+    void remove_entity(EntityID id);
 
-    bool containsEntity(EntityID id);
+    bool contains_entity(EntityID id);
 
-    void markEntityDestroyed(EntityID aID);
+    void mark_entity_detroyed(EntityID aID);
 
-    SubSystem* getSubsystem(SubSystemID id);
+    SubSystem* get_subsystem(SubSystemID id);
 
-    void addSubSystem(SubSystem* toAdd);
+    void add_subsystem(SubSystem* toAdd);
 
-    gfx::Transform& getTransform(EntityID id);
+    gfx::Transform& get_transform(EntityID id);
 
     void resolve_dependencies(); // TODO
 protected:

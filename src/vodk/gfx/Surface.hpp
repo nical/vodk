@@ -35,15 +35,15 @@ enum SurfaceFormat {
 class Surface {
 public:
     typedef uint8_t byte;
-    virtual SurfaceFormat getFormat() const = 0;
-    virtual const byte* getData(int bufIndex = 0) const = 0;
-    virtual IntSize getSize() const = 0;
-    virtual int getStride() const = 0;
-    virtual int getSkip() const = 0;
+    virtual SurfaceFormat get_format() const = 0;
+    virtual const byte* get_data(int bufIndex = 0) const = 0;
+    virtual IntSize get_size() const = 0;
+    virtual int get_stride() const = 0;
+    virtual int get_skip() const = 0;
     virtual ~Surface() {}
 };
 
-uint32_t bytesPerPixel(SurfaceFormat format);
+uint32_t bytes_per_pixel(SurfaceFormat format);
 
 } // gfx
 } // vodk

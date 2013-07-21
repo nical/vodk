@@ -24,33 +24,33 @@ void initQuad(RenderingContext* ctx) {
         1.0, 0.0
     };
 
-    _vao = ctx->createVertexArray();
+    _vao = ctx->create_vertex_array();
     ScopedBind<VertexArray> bind_vao(ctx, _vao);
 
     // vertices
     {
-        _vertex_vbo = ctx->createVertexBuffer();
+        _vertex_vbo = ctx->create_vertex_buffer();
         ScopedBind<VertexBuffer> bind_vbo(ctx, _vertex_vbo);
         ctx->upload(_vertex_vbo, range(vertices, 12).bytes());
-        ctx->defineVertexAttribute(0, gpu::FLOAT, 3, 0, 0);
-        ctx->enableVertexAttribute(0);
+        ctx->define_vertex_attribute(0, gpu::FLOAT, 3, 0, 0);
+        ctx->enable_vertex_attribute(0);
     }
 
     // texture coordinates
     {    
-        _texcoord_vbo = ctx->createVertexBuffer();
+        _texcoord_vbo = ctx->create_vertex_buffer();
         ScopedBind<VertexBuffer> bind_vbo(ctx, _texcoord_vbo);
         ctx->upload(_texcoord_vbo, range(tex_coords, 8).bytes());
-        ctx->defineVertexAttribute(1, gpu::FLOAT, 2, 0, 0);
-        ctx->enableVertexAttribute(1);
+        ctx->define_vertex_attribute(1, gpu::FLOAT, 2, 0, 0);
+        ctx->enable_vertex_attribute(1);
     }
 }
 
 void drawUnitQuad(RenderingContext* ctx) {
-    ctx->enableVertexAttribute(0);
-    ctx->enableVertexAttribute(1);
+    ctx->enable_vertex_attribute(0);
+    ctx->enable_vertex_attribute(1);
     gpu::ScopedBind<VertexArray> bind_vao(ctx, _vao);
-    ctx->drawArrays(gpu::TRIANGLE_STRIP, 0, 4);
+    ctx->draw_arrays(gpu::TRIANGLE_STRIP, 0, 4);
 }
 
 

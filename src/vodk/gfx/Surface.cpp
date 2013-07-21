@@ -22,7 +22,7 @@
 namespace vodk {
 namespace gfx {
 
-uint32_t bytesPerPixel(SurfaceFormat format)
+uint32_t bytes_per_pixel(SurfaceFormat format)
 {
     switch (format) {
         case SURFACE_R8G8B8A8: return 4;

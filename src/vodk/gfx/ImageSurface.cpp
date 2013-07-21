@@ -27,7 +27,7 @@ namespace gfx {
 bool ImageSurface::allocate(const IntSize& size, SurfaceFormat f)
 {
     printf("ImageSurface::allocate\n");
-    uint32_t bpp = bytesPerPixel(f);
+    uint32_t bpp = bytes_per_pixel(f);
     _size = size;
     _stride = bpp * size.width;
     uint32_t buf_size = size.width * size.height * bpp;

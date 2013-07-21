@@ -63,31 +63,31 @@ public:
 
     Asset(AssetManager* mgr)
     : kiwi::Node(mgr)
-    , _onLoadCB(nullptr), _state(INVALID)
+    , _on_loadCB(nullptr), _state(INVALID)
     {}
 
     virtual ~Asset()
     {
-        onLoad(nullptr);
+        on_load(nullptr);
     }
 
-    State getState() const {
+    State get_state() const {
         return _state;
     }
 
     AssetConnectionIterator dependencies() {
         return AssetConnectionIterator(inputConnections(), false);
     }
-    AssetConnectionIterator dependentAssets() {
+    AssetConnectionIterator dependent_assets() {
         return AssetConnectionIterator(outputConnections(), true);
     }
 
-    bool addDependency(Asset* dep, int port = 0) {
+    bool add_dependency(Asset* dep, int port = 0) {
         assert(dep);
-        return getGraph()->connect(*dep, 0, *this, port);
+        return get_graph()->connect(*dep, 0, *this, port);
     }
 
-    virtual AssetType getType() = 0;
+    virtual AssetType get_type() = 0;
 
     virtual bool load() = 0;
     virtual void unload() = 0;
@@ -98,30 +98,30 @@ public:
 
     typedef core::Closure<Asset> LoadCallback;
 
-    virtual void onLoad(LoadCallback* callback) {
-        if (_onLoadCB) {
-            delete _onLoadCB;
+    virtual void on_load(LoadCallback* callback) {
+        if (_on_loadCB) {
+            delete _on_loadCB;
         }
-        _onLoadCB = callback;
+        _on_loadCB = callback;
     }
 protected:
-    void notifyLoaded() {
-        if (_onLoadCB) {
-            _onLoadCB->call(*this);
+    void notify_loaded() {
+        if (_on_loadCB) {
+            _on_loadCB->call(*this);
         }
         _state = LOADED;
     }
-    void setState(State s) {
+    void set_state(State s) {
         _state = s;
     }
 private:
-    LoadCallback* _onLoadCB;
+    LoadCallback* _on_loadCB;
     State _state;
 };
 
 template<typename T> 
-T* castAsset(Asset* a) {
-    if (a->getType() == T::Type) return static_cast<T*>(a);
+T* cast_asset(Asset* a) {
+    if (a->get_type() == T::Type) return static_cast<T*>(a);
     return nullptr;
 }
 

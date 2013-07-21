@@ -60,7 +60,7 @@ public:
         _data.reserve(size);
     }
 
-    Index getIndex(Time t, Flag flag = BEFORE) const {
+    Index get_index(Time t, Flag flag = BEFORE) const {
         if (_data.size() == 0) { return 0; }
         if (_data[0].time > t) { return 0; }
         for (unsigned i = 0; i < _data.size(); ++i) {
@@ -71,35 +71,35 @@ public:
         return _data.size()-1;
     }
 
-    const Node& getNode(Time t, Flag flag = BEFORE) const {
-        return _data[getIndex(t, flag)];
+    const Node& get_node(Time t, Flag flag = BEFORE) const {
+        return _data[get_index(t, flag)];
     }
 
-    Node& getNode(Time t, Flag flag = BEFORE) {
-        return _data[getIndex(t, flag)];
+    Node& get_node(Time t, Flag flag = BEFORE) {
+        return _data[get_index(t, flag)];
     }
 
-    const Node& getNthNode(uint32_t nth) const {
+    const Node& get_nth_node(uint32_t nth) const {
         return _data[nth];
     }
 
-    Node& getNthNode(uint32_t nth) {
+    Node& get_nth_node(uint32_t nth) {
         return _data[nth];
     }
 
     T& get(Time t, Flag flag = BEFORE) const {
-        return getNode(t, flag).data;
+        return get_node(t, flag).data;
     }
 
-    const T& getNth(uint32_t nth) const {
-        return getNthNode(nth).data;
+    const T& get_nth(uint32_t nth) const {
+        return get_nth_node(nth).data;
     }
 
-    T& getNth(uint32_t nth) {
-        return getNthNode(nth).data;
+    T& get_nth(uint32_t nth) {
+        return get_nth_node(nth).data;
     }
 
-    Time startTime() const {
+    Time start_time() const {
         return size() > 0 ? _data[0].time : 0.0;
     }
 
@@ -112,7 +112,7 @@ public:
             _data.push_back(Node(toAdd, time));
             return;
         }
-        Index idx = getIndex(time, AFTER);
+        Index idx = get_index(time, AFTER);
         if (_data[idx].time < time) {
             _data.push_back(Node(toAdd, time));
             return;
@@ -130,7 +130,7 @@ public:
 
     uint32_t size() const { return _data.size(); }
 
-    void shiftTime(Time offset) {
+    void shift_time(Time offset) {
         auto it = _data.begin();
         auto stop = _data.end();
         for (; it != stop; ++it) {
@@ -138,7 +138,7 @@ public:
         }
     }
 
-    void multiplyTime(float factor) {
+    void multiply_time(float factor) {
         auto it = _data.begin();
         auto stop = _data.end();
         for (; it != stop; ++it) {
@@ -173,10 +173,10 @@ public:
     typedef typename Timeline<T>::Node Node;
     typedef Timeline<T> Parent;
     T sample(Time t) {
-        const Node& a = Parent::getNode(t, Parent::BEFORE);
-        const Node& b = Parent::getNode(t, Parent::AFTER);
-        if (t <= Parent::startTime()) return Parent::getNth(0);
-        if (t >= Parent::startTime() + Parent::duration()) return Parent::getNth(0);
+        const Node& a = Parent::get_node(t, Parent::BEFORE);
+        const Node& b = Parent::get_node(t, Parent::AFTER);
+        if (t <= Parent::start_time()) return Parent::get_nth(0);
+        if (t >= Parent::start_time() + Parent::duration()) return Parent::get_nth(0);
         if (&a == &b) return a.data;
         return InterpolationFunc::compute(a.data, b.data, (t - a.time)/(b.time - a.time));
     }
@@ -218,7 +218,7 @@ struct Dump<InterpolatedTimeline<T, I>> {
     static void dump(const Timeline<T>& tl) {
         printf("{<InterpolatedTimeline> ");
         for (unsigned i = 0; i < tl.size(); ++i) {
-            debug::dump(tl.getNthNode(i));
+            debug::dump(tl.get_nth_node(i));
         }
         printf("}");
     }
@@ -229,7 +229,7 @@ struct Dump<Timeline<T>> {
     static void dump(const Timeline<T>& tl) {
         printf("{<Timeline> ");
         for (unsigned i = 0; i < tl.size(); ++i) {
-            debug::dump(tl.getNthNode(i));
+            debug::dump(tl.get_nth_node(i));
         }
         printf("}");
     }

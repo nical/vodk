@@ -26,10 +26,10 @@ namespace gfx {
 
 class Surface;
 
-bool uploadSurface(gpu::RenderingContext* ctx,
-                   gfx::Surface* src,
-                   const gpu::Texture& dest,
-                   gpu::UploadFlags flags = UPLOAD_DEFAULT);
+bool upload_surface(gpu::RenderingContext* ctx,
+                    gfx::Surface* src,
+                    const gpu::Texture& dest,
+                    gpu::UploadFlags flags = UPLOAD_DEFAULT);
 
 
 } // namespace

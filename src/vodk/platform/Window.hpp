@@ -23,7 +23,7 @@ public:
 
     Window(int w, int h, const char* title);
     virtual ~Window();
-    gpu::RenderingContext* getRenderingContext();
+    gpu::RenderingContext* get_rendering_context();
 
 private:
     gpu::RenderingContext* _gl;
@@ -48,9 +48,9 @@ public:
 
     Window(int w, int h, const char* title);
     virtual ~Window();
-    gpu::RenderingContext* getRenderingContext();
+    gpu::RenderingContext* get_rendering_context();
 
-    bool pollEvent(Event& e);
+    bool poll_events(Event& e);
     void display();
 private:
     gpu::RenderingContext* _gl;
@@ -69,7 +69,7 @@ public:
 
     Window(int w, int h, const char* title) {}
     virtual ~Window() {}
-    gpu::RenderingContext* getRenderingContext() { return nullptr; }
+    gpu::RenderingContext* get_rendering_context() { return nullptr; }
 };
 
 #endif // VODK_WIDGET_MOCK
