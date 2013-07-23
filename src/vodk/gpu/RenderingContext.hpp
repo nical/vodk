@@ -72,7 +72,10 @@ enum TextureFlags {
 enum TargetBuffer {
     COLOR_BUFFER    = 1,
     DEPTH_BUFFER    = 2,
-    STENCIL_BUFFER  = 4
+    STENCIL_BUFFER  = 4,
+    ALL_BUFFERS     = COLOR_BUFFER
+                    | DEPTH_BUFFER 
+                    | STENCIL_BUFFER
 };
 
 enum AttributeType {
