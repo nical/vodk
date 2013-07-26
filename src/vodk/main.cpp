@@ -48,7 +48,7 @@ bool mainLoop() {
     ctx->send_unirform(ctx->get_uniform_location(p, "in_Texture"), 0, texture_asset->get_texture());
     ctx->send_unirform(ctx->get_uniform_location(p, "in_ModelView"), model_view);
     ctx->send_unirform(ctx->get_uniform_location(p, "in_Transform"), transform);
-    gpu::drawUnitQuad(ctx);
+    gpu::draw_unit_quad(ctx);
 */
     gfxComponents->render(16.0);
 
@@ -69,7 +69,7 @@ int main()
     // create the window
     window = new io::Window(480, 320, "Vodk");
     ctx = window->get_rendering_context();
-    gpu::initQuad(ctx);
+    gpu::init_quad(ctx);
     data::InitImageAssetManager();
     ctx->set_viewport(0,0,480,320);
 
@@ -104,6 +104,9 @@ int main()
     } else {
         printf("failed to load img/test.png\n");
     }
+
+    auto e1 = scope->add_entity(EntityDescriptor(0.0, 0.0, 0.0, SYSTEM_GFX_BASIC));
+    auto e2 = scope->add_entity(EntityDescriptor(-1.0, 0.0, 0.0, SYSTEM_GFX_BASIC));
 
     gfxComponents = new vodk::gfx::BasicGfxSubSystem(nullptr, 1, ctx, program_asset, texture_asset);
     gfx::BasicGfxComponent gfxcomp1(0, glm::mat4(1.0));

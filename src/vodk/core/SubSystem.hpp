@@ -78,12 +78,13 @@ protected:
 
 enum SubSystemName {
     // transforms
-    SYSTEM_TRANFORM_2D,
-    SYSTEM_TRANFORM_3D,
+    SYSTEM_TRANFORM,
     // gfx/anim
     SYSTEM_ANIMATION_SPRITE,
     SYSTEM_ANIMATION_SKELETON,
     // gfx
+    SYSTEM_GFX_BASIC,
+    SYSTEM_GFX_QUAD,
     SYSTEM_GFX_TILEDMAP,
     SYSTEM_GFX_IMAGE,
     SYSTEM_GFX_3DMODEL,

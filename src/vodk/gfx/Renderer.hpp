@@ -54,6 +54,11 @@ public:
 	virtual bool render(gpu::RenderingContext& ctx) override;
 };
 
+class DrawQuadRenderItem : public RenderItem {
+public:
+	virtual bool render(gpu::RenderingContext& ctx) override;	
+};
+
 class Renderer {
 public:
 	virtual void add_render_item(RenderItem* item) = 0;

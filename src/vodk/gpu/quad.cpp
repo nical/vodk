@@ -10,7 +10,7 @@ static gpu::VertexArray _vao(gpu::STATIC_UPDATE);
 static gpu::VertexBuffer _vertex_vbo(gpu::STATIC_UPDATE);
 static gpu::VertexBuffer _texcoord_vbo(gpu::STATIC_UPDATE);
 
-void initQuad(RenderingContext* ctx) {
+void init_quad(RenderingContext* ctx) {
     float vertices[12] = {
         0.0, 0.0, 0.0,
         0.0, 1.0, 0.0,
@@ -46,7 +46,7 @@ void initQuad(RenderingContext* ctx) {
     }
 }
 
-void drawUnitQuad(RenderingContext* ctx) {
+void draw_unit_quad(RenderingContext* ctx) {
     ctx->enable_vertex_attribute(0);
     ctx->enable_vertex_attribute(1);
     gpu::ScopedBind<VertexArray> bind_vao(ctx, _vao);

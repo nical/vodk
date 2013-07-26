@@ -22,7 +22,7 @@
 
 namespace vodk {
 
-EntityID Scope::add_entity(EntityDescriptor& desc) {
+EntityID Scope::add_entity(const EntityDescriptor& desc) {
     EntityOffset idx = 0;
 
     while (idx != _entities.size() && _entities[idx].state != ENTITY_STATE_NORMAL) {

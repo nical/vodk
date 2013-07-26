@@ -23,6 +23,7 @@
 #include <stdint.h>
 #include "vodk/core/ObjectID.hpp"
 #include "vodk/gfx/Transform.hpp"
+#include "vodk/core/Range.hpp"
 
 namespace vodk {
 
@@ -38,6 +39,36 @@ public:
 private:
     PluginComponent* _next;
 };
+
+// TODO create entities separately from components
+struct EntityDescriptor {
+    EntityDescriptor(float x = 0.0f, float y = 0.0f, float z = 0.0f,
+                     SubSystemID s1 = 0,
+                     SubSystemID s2 = 0,
+                     SubSystemID s3 = 0,
+                     SubSystemID s4 = 0,
+                     SubSystemID s5 = 0,
+                     SubSystemID s6 = 0,
+                     SubSystemID s7 = 0,
+                     SubSystemID s8 = 0)
+    : _x(x), _y(y), _z(z)
+    , _s1(s1), _s2(s2), _s3(s3), _s4(s4)
+    , _s5(s5), _s6(s6), _s7(s7), _s8(s8)
+    , components(&_s1, 8)
+    {}
+
+    Range<SubSystemID> components;
+    float _x, _y, _z;
+    SubSystemID _s1;
+    SubSystemID _s2;
+    SubSystemID _s3;
+    SubSystemID _s4;
+    SubSystemID _s5;
+    SubSystemID _s6;
+    SubSystemID _s7;
+    SubSystemID _s8;
+};
+
 
 typedef uint8_t EntityState;
 const EntityState ENTITY_STATE_EMPTY        = 0;

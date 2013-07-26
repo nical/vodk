@@ -44,6 +44,11 @@ public:
         return _start[i];
     }
 
+    const T& operator[](uint32_t i) const {
+        assert(i < size());
+        return _start[i];
+    }
+
     /**
      * Returns a slice of this range.
      */
@@ -55,6 +60,10 @@ public:
      * Returns a pointer to the first element.
      */
     T* pointer() {
+        return _start;
+    }
+
+    const T* pointer() const {
         return _start;
     }
 

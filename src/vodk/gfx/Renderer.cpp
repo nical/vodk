@@ -1,6 +1,7 @@
 
 #include "vodk/gfx/Renderer.hpp"
 #include "vodk/gpu/RenderingContext.hpp"
+#include "vodk/gpu/quad.hpp"
 
 namespace vodk {
 namespace gfx {
@@ -26,6 +27,10 @@ void RenderList::push_back(RenderItem* item) {
 
 bool ClearRenderItem::render(gpu::RenderingContext& ctx) {
     ctx.clear(gpu::ALL_BUFFERS);
+}
+
+bool DrawQuadRenderItem::render(gpu::RenderingContext& ctx) {
+    gpu::draw_unit_quad(&ctx);
 }
 
 } // gfx

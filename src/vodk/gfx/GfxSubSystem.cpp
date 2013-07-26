@@ -23,7 +23,7 @@ BasicGfxSubSystem::render(float dt) {
         _ctx->send_unirform(_ctx->get_uniform_location(p, "in_ModelView"), mv);
         _ctx->send_unirform(_ctx->get_uniform_location(p, "in_Transform"), c.transform);
 
-        gpu::drawUnitQuad(_ctx);
+        gpu::draw_unit_quad(_ctx);
     }
 }
 

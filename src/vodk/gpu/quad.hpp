@@ -7,8 +7,8 @@ namespace gpu {
 
 class RenderingContext;
 
-void initQuad(gpu::RenderingContext* ctx);
-void drawUnitQuad(gpu::RenderingContext* ctx);
+void init_quad(gpu::RenderingContext* ctx);
+void draw_unit_quad(gpu::RenderingContext* ctx);
 
 } // namespace gpu
 } // namespace vodk

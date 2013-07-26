@@ -40,16 +40,13 @@ namespace gfx {
 class Transform;
 } // gfx
 
-struct EntityDescriptor {
-    Range<SubSystemID> components;
-};
 
 class Scope {
 public:
     Scope();
     ~Scope();
 
-    EntityID add_entity(EntityDescriptor& desc);
+    EntityID add_entity(const EntityDescriptor& desc);
 
     void remove_entity(EntityID id);
 
