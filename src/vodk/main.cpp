@@ -26,7 +26,7 @@ io::Window* window;
 data::ShaderProgramAsset* program_asset;
 data::TextureAsset* texture_asset;
 
-gfx::BasicGfxSubSystem* gfxComponents;
+gfx::BasicGfxSubSystem* basic_gfx;
 Scope* scope;
 
 bool mainLoop() {
@@ -50,10 +50,11 @@ bool mainLoop() {
     ctx->send_unirform(ctx->get_uniform_location(p, "in_Transform"), transform);
     gpu::draw_unit_quad(ctx);
 */
-    gfxComponents->render(16.0);
+    basic_gfx->render(16.0);
 
     printf("foo\n");
     window->display();
+    scope->flush();
     printf("bar\n");
     return true;
 }
@@ -105,10 +106,28 @@ int main()
         printf("failed to load img/test.png\n");
     }
 
-    auto e1 = scope->add_entity(EntityDescriptor(0.0, 0.0, 0.0, SYSTEM_GFX_BASIC));
-    auto e2 = scope->add_entity(EntityDescriptor(-1.0, 0.0, 0.0, SYSTEM_GFX_BASIC));
+    basic_gfx = new vodk::gfx::BasicGfxSubSystem(
+        nullptr, ctx, program_asset, texture_asset
+    );
+    scope->add_subsystem(basic_gfx);
 
-    gfxComponents = new vodk::gfx::BasicGfxSubSystem(nullptr, 1, ctx, program_asset, texture_asset);
+    scope->add_entity_async(EntityDescriptor(
+        0.0, 0.0, 0.0,
+        SYSTEM_GFX_BASIC,
+        SYSTEM_NONE,
+        SYSTEM_NONE,
+        SYSTEM_NONE
+    ));
+    scope->add_entity_async(EntityDescriptor(
+        -1.0, 0.0, 0.0,
+        SYSTEM_GFX_BASIC,
+        SYSTEM_NONE,
+        SYSTEM_NONE,
+        SYSTEM_NONE
+    ));
+
+    scope->flush();
+
     gfx::BasicGfxComponent gfxcomp1(0, glm::mat4(1.0));
     glm::mat4 m1(1.0);
     gfx::BasicGfxComponent gfxcomp2(1, glm::translate(m1, glm::vec3(-1.0, 0.0, 0.0)));

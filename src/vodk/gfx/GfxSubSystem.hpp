@@ -49,30 +49,28 @@ class BasicGfxSubSystem : public TSubSystem<BasicGfxComponent>
 public:
     typedef TSubSystem<BasicGfxComponent> Parent;
 
-    BasicGfxSubSystem(Scope* s, SubSystemID id,
+    BasicGfxSubSystem(Scope* s,
                       gpu::RenderingContext* context,
                       data::ShaderProgramAsset* shader,
                       data::TextureAsset* texture)
-    : Parent(id)
+    : Parent()
     , _scope(s)
     , _ctx(context)
     , _shader(shader)
     , _tex(texture)
     {}
 
+    virtual SubSystemID id() const { return SYSTEM_GFX_BASIC; }
+
     virtual void render(float dt) override;
 
     virtual void update(float dt) override {}
 
-    virtual Range<SubSystemID> dependencies() override {
-        return Range<SubSystemID>(&_transformDependency, 1);
-    }
 protected:
     Scope* _scope;
     gpu::RenderingContext* _ctx;
     data::ShaderProgramAsset* _shader;
     data::TextureAsset* _tex;
-    SubSystemID _transformDependency;
 };
 
 } // namespace gfx

@@ -1,7 +1,7 @@
 
 #include "vodk/logic/runtime.hpp"
 #include "vodk/logic/AST.hpp"
-#include "vodk/core/Entity.hpp"
+#include "vodk/core/Scope.hpp"
 #include "vodk/core/Range.hpp"
 
 namespace vodk {
