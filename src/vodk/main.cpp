@@ -107,7 +107,7 @@ int main()
     }
 
     basic_gfx = new vodk::gfx::BasicGfxSubSystem(
-        nullptr, ctx, program_asset, texture_asset
+        scope, ctx, program_asset, texture_asset
     );
     scope->add_subsystem(basic_gfx);
 

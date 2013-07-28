@@ -32,7 +32,7 @@ struct SubSystem {
     virtual ~SubSystem() {}
     virtual SubSystemID id() const = 0;
 
-    virtual ComponentOffset add(EntityOffset e) = 0;
+    virtual ComponentOffset add(EntityID id) = 0;
     virtual void remove(ComponentOffset, Range<Entity> entities) = 0;
 
     virtual void destroy() {}
@@ -52,7 +52,7 @@ struct TSubSystem : public SubSystem {
 
     virtual ~TSubSystem() {}
 
-    virtual ComponentOffset add(EntityOffset entity) override {
+    virtual ComponentOffset add(EntityID entity) override {
         _components.resize(_components.size() + 1);
         _components[_components.size() - 1].entity = entity;
         return _components.size() -1;
@@ -63,9 +63,9 @@ struct TSubSystem : public SubSystem {
         _components[offset] = _components[_components.size() - 1];
         // fixup the offset in the entity that was pointing to the last one
         if (Category == COMPONENT_PLUGIN) {
-            entities[_components[offset].entity].find_plugin_component(id())->offset = offset;
+            entities[_components[offset].entity.offset].find_plugin_component(id())->offset = offset;
         } else {
-            entities[_components[offset].entity].standard_components()[Category].offset = offset;
+            entities[_components[offset].entity.offset].standard_components()[Category].offset = offset;
         }
         // resize
         _components.resize(_components.size() - 1);

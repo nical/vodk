@@ -34,6 +34,7 @@ void Scope::add_entity_async(const EntityDescriptor& desc) {
 void Scope::remove_entity_async(EntityID aID) {
     assert(contains_entity(aID));
     _entities[aID.offset]._state = ENTITY_STATE_EMPTY;
+    _to_remove.push_back(aID.offset);
 }
 
 bool Scope::contains_entity(EntityID id) {
@@ -42,47 +43,50 @@ bool Scope::contains_entity(EntityID id) {
 }
 
 void Scope::flush() {
-    auto it = _entities.begin();
-    auto stop = _entities.end();
+    auto rm_it = _to_remove.begin();
+    auto rm_stop = _to_remove.end();
     auto add_it = _to_add.begin();
     auto add_stop = _to_add.end();
     // iterate over all entities
-    while (it != stop) {
-        if (it->get_state() == ENTITY_STATE_NORMAL) {
-            continue;
-        }
+    while (rm_it != rm_stop) {
+        printf("rm loop\n");
+        Entity& e = _entities[*rm_it];
+        assert(e.get_state() != ENTITY_STATE_NORMAL);
 
         // iterate over standard components to remove them
-        auto c_it = it->standard_components().begin();
-        auto c_stop = it->standard_components().end();
+        auto c_it = e.standard_components().begin();
+        auto c_stop = e.standard_components().end();
         while (c_it != c_stop) {
-            if (c_it->subSystem == 0) continue;
-            _subSystems[c_it->subSystem]->remove(c_it->offset, entity_range());
+            if (c_it->subSystem != 0) {
+                _subSystems[c_it->subSystem]->remove(c_it->offset, entity_range());
+            }
             ++c_it;
         }
 
         // iterate over plugin components to remove them
-        c_it = it->plugin_components().begin();
-        c_stop = it->plugin_components().end();
+        c_it = e.plugin_components().begin();
+        c_stop = e.plugin_components().end();
         while (c_it != c_stop) {
-            if (c_it->subSystem == 0) continue;
-            _subSystems[c_it->subSystem]->remove(c_it->offset, entity_range());
+            if (c_it->subSystem != 0) {
+                _subSystems[c_it->subSystem]->remove(c_it->offset, entity_range());
+            }
             ++c_it;
         }
 
         // if there are objects to add, add one in the blank we just made.
         if (add_it != add_stop) {
-            EntityOffset offset = &(*it) - &(*_entities.begin());
-            init_entity(*it, offset, *add_it);
+            printf("add\n");
+            init_entity(e, *rm_it, *add_it);
             ++add_it;
         } else {
-            reset_entity(*it);
+            reset_entity(e);
         }
-        ++it;
+        ++rm_it;
     }
 
     // process the remaining entities to add
     while (add_it != add_stop) {
+        printf("add\n");
         _entities.push_back(Entity());
         EntityOffset offset = _entities.size() - 1;
         init_entity(_entities[offset], offset, *add_it);
@@ -93,6 +97,7 @@ void Scope::flush() {
 
 void Scope::init_entity(Entity& e, EntityOffset offset, EntityDescriptor& desc)
 {
+    e._state = ENTITY_STATE_NORMAL;
     e._transform = desc.transform;
     e._physics = ComponentID(desc.physics, desc.physics ? get_subsystem(desc.physics)->add(offset) : 0);
     e._graphics = ComponentID(desc.graphics, desc.graphics ? get_subsystem(desc.graphics)->add(offset) : 0);
@@ -125,8 +130,9 @@ Entity::find_plugin_component(SubSystemID id) {
 }
 
 
-gfx::Transform& Scope::get_transform(EntityID id) {
-    _entities[id.offset]._transform;
+gfx::Transform* Scope::get_transform(EntityID id) {
+    assert(contains_entity(id));
+    &_entities[id.offset]._transform;
 }
 
 void Scope::add_subsystem(SubSystem* toAdd) {

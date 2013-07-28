@@ -215,7 +215,7 @@ public:
 
     void add_subsystem(SubSystem* toAdd);
 
-    gfx::Transform& get_transform(EntityID id);
+    gfx::Transform* get_transform(EntityID id);
 
     void resolve_dependencies(); // TODO
 
@@ -231,6 +231,7 @@ protected:
     SubSystemID _scopeID;
     uint16_t _genHash;
     std::vector<EntityDescriptor> _to_add;
+    std::vector<EntityOffset> _to_remove;
 };
 
 } // vodk

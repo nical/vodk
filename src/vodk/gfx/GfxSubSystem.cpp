@@ -15,13 +15,13 @@ BasicGfxSubSystem::render(float dt) {
     while (!objects.empty()) {
         printf("render basic object\n");
         BasicGfxComponent& c = objects.pop_front();
-        glm::mat4 transform;
+        glm::mat4 t = _scope->get_transform(c.entity)->matrix();
 
         gpu::ShaderProgram p = _shader->get_shader_program();
         _ctx->bind(p);
         _ctx->send_unirform(_ctx->get_uniform_location(p, "in_Texture"), 0, _tex->get_texture());
         _ctx->send_unirform(_ctx->get_uniform_location(p, "in_ModelView"), mv);
-        _ctx->send_unirform(_ctx->get_uniform_location(p, "in_Transform"), c.transform);
+        _ctx->send_unirform(_ctx->get_uniform_location(p, "in_Transform"), t);
 
         gpu::draw_unit_quad(_ctx);
     }

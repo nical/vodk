@@ -36,7 +36,7 @@ struct BasicGfxComponent {
 
     glm::mat4 transform;
     ObjectID::Index index;
-    EntityOffset entity;
+    EntityID entity;
     ObjectID::GenHash genHash;
 };
 
