@@ -21,10 +21,10 @@
 #include "GfxAssets.hpp"
 #include "vodk/gfx/ImageSurface.hpp"
 #include "vodk/parser/png.hpp"
+#include "vodk/io/file.hpp"
+#include "vodk/core/Blob.hpp"
 #include <memory.h>
 #include <assert.h>
-
-unsigned int loadFile(const char* path, char *& buffer);
 
 namespace vodk {
 namespace data {
@@ -121,18 +121,17 @@ bool ShaderAsset::load()
     StringAsset* str_asset = cast_asset<StringAsset>(&*dependencies());
     assert(str_asset);
 
-    char* src;
-    int len = loadFile(str_asset->get_string().c_str(), src);
+    Blob src_blob = io::load_from_file(str_asset->get_string().c_str());
+    AutoDeallocateBlob autob(src_blob);
 
-    if (len > 0) {
+    if (src_blob.is_allocated()) {
+        char* src = (char*)src_blob.bytes().pointer();
+        int len = src_blob.bytes().size();
         gpu::ShaderSource vs(1, &src, &len);
         bool result = _ctx->compile_shader(_shader, vs);
-
-        delete[] src;
         return result;
     } else printf("failed to find file %s\n", str_asset->get_string().c_str());
 
-    delete[] src;
     return false;
 }
 

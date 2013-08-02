@@ -4,10 +4,6 @@
 
 #include "vodk/core/config.hpp"
 
-#ifdef VODK_WIDGET_SFML
-#include <SFML/Window.hpp>
-#endif // VODK_WIDGET_SFML
-
 namespace vodk {
 
 namespace gpu {

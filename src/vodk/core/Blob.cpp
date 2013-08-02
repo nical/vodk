@@ -17,50 +17,50 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef VODK_GFX_IMAGESURFACE_HPP
-#define VODK_GFX_IMAGESURFACE_HPP
-
-#include "vodk/gfx/Surface.hpp"
+#include "vodk/core/Blob.hpp"
 
 namespace vodk {
-namespace gfx {
 
-class ImageSurface : public gfx::Surface
-{
-public:
-    typedef uint8_t byte;
-    ImageSurface()
-    : _data(nullptr), _stride(0), _skip(0), _format(gfx::SURFACE_R8G8B8A8)
-    {}
-
-    ~ImageSurface() {
-        deallocate();
-    }
-
-    bool allocate(const IntSize& size, SurfaceFormat f);
-    void deallocate();
-
-    // Surface
-    virtual SurfaceFormat get_format() const override { return gfx::SURFACE_R8G8B8A8; }
-
-    virtual const byte* get_data(int bufIndex = 0) const override { return _data; }
-    byte* get_data(int bufIndex = 0) { return _data; }
-
-    virtual IntSize get_size() const override {
-        return _size;
-    }
-    virtual int get_stride() const override { return _stride; } 
-    virtual int get_skip() const override { return _skip; }
-
-protected:
-    byte* _data;
-    IntSize _size;
-    uint32_t _stride;
-    uint32_t _skip;
-    SurfaceFormat _format;
+struct BlobMetaData {
+	uint32_t size;
+	uint32_t type;
+	uint32_t offset;
 };
 
-} // gfx
-} // vodk
+static BlobMetaData* _md(void* buf) {
+	return static_cast<BlobMetaData*>(buf);
+}
 
-#endif
+static uint8_t* _data(void* buf) {
+	return static_cast<uint8_t*>(buf) + static_cast<BlobMetaData*>(buf)->offset;
+}
+
+ByteRange Blob::bytes()
+{
+	return ByteRange(_data(_buffer), _md(_buffer)->size);
+}
+
+uint32_t Blob::size() const
+{
+	return _md(_buffer)->size;
+}
+
+uint32_t Blob::type() const
+{
+	return _md(_buffer)->type;
+}
+
+
+bool Blob::allocate(uint32_t size, uint32_t type) {
+	_buffer = new uint8_t[size + sizeof(BlobMetaData)];
+	_md(_buffer)->size = size;
+	_md(_buffer)->type = type;
+	_md(_buffer)->offset = sizeof(BlobMetaData);
+	return true;
+}
+
+void Blob::deallocate() {
+	delete (uint8_t*)_buffer;
+}
+
+} // vodk

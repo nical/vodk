@@ -30,14 +30,7 @@ public:
 };
 
 struct BasicGfxComponent {
-    BasicGfxComponent() {}
-    BasicGfxComponent(EntityOffset aEntity, glm::mat4 aTransform)
-    : entity(aEntity), transform(aTransform) {}
-
-    glm::mat4 transform;
-    ObjectID::Index index;
     EntityID entity;
-    ObjectID::GenHash genHash;
 };
 
 /**

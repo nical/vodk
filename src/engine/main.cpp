@@ -8,14 +8,22 @@
 #include "vodk/core/IDLookupVector.hpp"
 #include "vodk/core/Timeline.hpp"
 #include "vodk/gfx/GfxSubSystem.hpp"
+#include "vodk/gfx/ImageSurface.hpp"
 #include "vodk/core/Scope.hpp"
+#include "vodk/io/file.hpp"
 
 #include <glm/gtc/matrix_transform.hpp>
 
 #include <stdio.h>
 #include <assert.h>
+#include <vector>
 
-unsigned int loadFile(const char* path, char *& buffer);
+
+namespace vodk {
+namespace gfx {
+bool vectorize(vodk::gfx::ImageSurface* in, std::vector<glm::vec2>& out);
+}
+}
 
 using namespace vodk;
 using namespace vodk::data;
@@ -29,8 +37,8 @@ data::TextureAsset* texture_asset;
 gfx::BasicGfxSubSystem* basic_gfx;
 Scope* scope;
 
-bool mainLoop() {
-    printf("mainLoop\n");
+bool main_loop() {
+    printf("main_loop\n");
     io::Window::Event event;
     while (window->poll_events(event)) {
         if (event.type == io::Window::Event::Closed) {
@@ -40,22 +48,11 @@ bool mainLoop() {
 
     ctx->clear(gpu::targetBuffer(gpu::COLOR_BUFFER|gpu::DEPTH_BUFFER));
 
-    glm::mat4 model_view(1.0);
-    glm::mat4 transform(1.0);
-/*
-    gpu::ShaderProgram p = program_asset->get_shader_program();
-    ctx->bind(p);
-    ctx->send_unirform(ctx->get_uniform_location(p, "in_Texture"), 0, texture_asset->get_texture());
-    ctx->send_unirform(ctx->get_uniform_location(p, "in_ModelView"), model_view);
-    ctx->send_unirform(ctx->get_uniform_location(p, "in_Transform"), transform);
-    gpu::draw_unit_quad(ctx);
-*/
     basic_gfx->render(16.0);
 
-    printf("foo\n");
     window->display();
     scope->flush();
-    printf("bar\n");
+
     return true;
 }
 
@@ -65,7 +62,6 @@ int main()
     vodk::unittest::IDLookupVector();
     vodk::unittest::Timeline();
     vodk::unittest::ast();
-
 
     // create the window
     window = new io::Window(480, 320, "Vodk");
@@ -88,7 +84,7 @@ int main()
                                                   new data::StringAsset(&mgr, "assets/shaders/textured.frag"));
     program_asset = new data::ShaderProgramAsset(&mgr, ctx, vs_asset, fs_asset);
 
-    ImageAsset img_asset(&mgr, "assets/img/test.png");
+    ImageAsset img_asset(&mgr, "assets/img/test2.png");
 
     texture_asset = new TextureAsset(&mgr, ctx, &img_asset);
 
@@ -101,6 +97,8 @@ int main()
     }
 
     if (img_asset.load()) {
+        std::vector<glm::vec2> points;
+        vodk::gfx::vectorize(img_asset.get_image(), points);
         texture_asset->load();
     } else {
         printf("failed to load img/test.png\n");
@@ -128,42 +126,13 @@ int main()
 
     scope->flush();
 
-    gfx::BasicGfxComponent gfxcomp1(0, glm::mat4(1.0));
-    glm::mat4 m1(1.0);
-    gfx::BasicGfxComponent gfxcomp2(1, glm::translate(m1, glm::vec3(-1.0, 0.0, 0.0)));
-    //gfxComponents->add(gfxcomp1);
-    //gfxComponents->add(gfxcomp2);
-
 #ifndef EMSCRITEN
     // main loop
-    while (mainLoop()) {}
+    while (main_loop()) {}
 #else
-    mainLoop();
+    main_loop();
 #endif
 
     return 0;
 }
 
-#include <iostream>
-#include <fstream>
-unsigned int loadFile(const char* path, char *& buffer)
-{
-    std::ifstream file(path);
-    if (!file.is_open()) {
-        buffer = nullptr;
-        return -1;
-    }
-    // get length of file:
-    file.seekg(0, std::ios::end);
-    int length = file.tellg();
-    file.seekg(0, std::ios::beg);
-
-    // allocate memory:
-    buffer = new char [length];
-
-    // read data as a block:
-    file.read(buffer,length);
-    file.close();
-
-    return length;
-}

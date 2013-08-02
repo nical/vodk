@@ -1,5 +1,5 @@
 SConscript('SConscript',
-            variant_dir='build/sdl',
+            variant_dir='build/linux',
             duplicate=0,
             exports={'build_target':'debug',
                      'widget':'SDL'})

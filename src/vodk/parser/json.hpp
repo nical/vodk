@@ -34,6 +34,10 @@ public:
 
     bool parse(const std::string& src);
     bool parse(const char* src, int nChars);
+
+    // TODO
+    // template<typename CharStream> read(CharStream& s);
+
     void reset();
     bool is_finished() const;
 protected:
@@ -57,6 +61,7 @@ private:
     int _currentIndex;
     int _state;
     uint64_t _nextID;
+    //std::vector<char> _buffer;
 };
 
 

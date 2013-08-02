@@ -46,13 +46,12 @@ void init_quad(RenderingContext* ctx) {
     }
 }
 
-void draw_unit_quad(RenderingContext* ctx) {
+void draw_unit_quad(RenderingContext* ctx, DrawMode mode) {
     ctx->enable_vertex_attribute(0);
     ctx->enable_vertex_attribute(1);
     gpu::ScopedBind<VertexArray> bind_vao(ctx, _vao);
-    ctx->draw_arrays(gpu::TRIANGLE_STRIP, 0, 4);
+    ctx->draw_arrays(mode, 0, 4);
 }
-
 
 } // namespace gpu
 } // namespace vodk

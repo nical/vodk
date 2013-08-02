@@ -17,50 +17,37 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef VODK_GFX_IMAGESURFACE_HPP
-#define VODK_GFX_IMAGESURFACE_HPP
+#include "vodk/io/file.hpp"
 
-#include "vodk/gfx/Surface.hpp"
+#include <iostream>
+#include <fstream>
+#include "vodk/core/Blob.hpp"
 
 namespace vodk {
-namespace gfx {
+namespace io {
 
-class ImageSurface : public gfx::Surface
+Blob load_from_file(const char* path)
 {
-public:
-    typedef uint8_t byte;
-    ImageSurface()
-    : _data(nullptr), _stride(0), _skip(0), _format(gfx::SURFACE_R8G8B8A8)
-    {}
+	Blob blob;
+    std::ifstream file(path);
+    if (!file.is_open()) {
+    	return Blob();
+	}
+    // get length of file:
+    file.seekg(0, std::ios::end);
+    int length = file.tellg();
+    file.seekg(0, std::ios::beg);
 
-    ~ImageSurface() {
-        deallocate();
-    }
+    // allocate memory:
+    blob.allocate(length);
 
-    bool allocate(const IntSize& size, SurfaceFormat f);
-    void deallocate();
+    // read data as a block:
+    file.read(blob.range<char>().pointer(),
+    		  blob.bytes().size());
+    file.close();
 
-    // Surface
-    virtual SurfaceFormat get_format() const override { return gfx::SURFACE_R8G8B8A8; }
+    return blob;
+}
 
-    virtual const byte* get_data(int bufIndex = 0) const override { return _data; }
-    byte* get_data(int bufIndex = 0) { return _data; }
-
-    virtual IntSize get_size() const override {
-        return _size;
-    }
-    virtual int get_stride() const override { return _stride; } 
-    virtual int get_skip() const override { return _skip; }
-
-protected:
-    byte* _data;
-    IntSize _size;
-    uint32_t _stride;
-    uint32_t _skip;
-    SurfaceFormat _format;
-};
-
-} // gfx
+} // io
 } // vodk
-
-#endif

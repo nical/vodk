@@ -50,7 +50,7 @@ void Window::display()
 {
     SDL_GL_SwapBuffers();
 #if !EMSCRIPTEN
-    SDL_Delay(16);
+    SDL_Delay(1600);
 #endif
 }
 

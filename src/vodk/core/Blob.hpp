@@ -17,50 +17,42 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#ifndef VODK_GFX_IMAGESURFACE_HPP
-#define VODK_GFX_IMAGESURFACE_HPP
+#ifndef VODK_CORE_BLOB_HPP
+#define VODK_CORE_BLOB_HPP
 
-#include "vodk/gfx/Surface.hpp"
+#include <stdint.h>
+#include "vodk/core/Range.hpp"
 
 namespace vodk {
-namespace gfx {
 
-class ImageSurface : public gfx::Surface
-{
+class Blob {
 public:
-    typedef uint8_t byte;
-    ImageSurface()
-    : _data(nullptr), _stride(0), _skip(0), _format(gfx::SURFACE_R8G8B8A8)
-    {}
+    Blob() : _buffer(nullptr) {}
 
-    ~ImageSurface() {
-        deallocate();
+    ByteRange bytes();
+
+    template<typename T> Range<T> range() {
+        return Range<T>((T*)bytes().pointer(), size()/sizeof(T));
     }
 
-    bool allocate(const IntSize& size, SurfaceFormat f);
+    uint32_t size() const;
+    uint32_t type() const;
+
+    bool is_allocated() const { return !!_buffer; }
+
+    bool allocate(uint32_t size, uint32_t type = 0);
     void deallocate();
 
-    // Surface
-    virtual SurfaceFormat get_format() const override { return gfx::SURFACE_R8G8B8A8; }
-
-    virtual const byte* get_data(int bufIndex = 0) const override { return _data; }
-    byte* get_data(int bufIndex = 0) { return _data; }
-
-    virtual IntSize get_size() const override {
-        return _size;
-    }
-    virtual int get_stride() const override { return _stride; } 
-    virtual int get_skip() const override { return _skip; }
-
 protected:
-    byte* _data;
-    IntSize _size;
-    uint32_t _stride;
-    uint32_t _skip;
-    SurfaceFormat _format;
+    void* _buffer;
 };
 
-} // gfx
+struct AutoDeallocateBlob {
+    AutoDeallocateBlob(Blob& b) : blob(&b) {}
+    ~AutoDeallocateBlob() { blob->deallocate(); }
+    Blob* blob;
+};
+
 } // vodk
 
 #endif
