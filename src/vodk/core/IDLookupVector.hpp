@@ -146,10 +146,6 @@ struct Dump<vodk::IDLookupVector<T,ID>> {
 
 } // debug
 
-namespace unittest {
-void IDLookupVector();
-} // unittest
-
 } // vodk
 
 #endif

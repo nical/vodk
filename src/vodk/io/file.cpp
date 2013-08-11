@@ -26,12 +26,11 @@
 namespace vodk {
 namespace io {
 
-Blob load_from_file(const char* path)
+bool load_from_file(const char* path, Blob& dest)
 {
-	Blob blob;
     std::ifstream file(path);
     if (!file.is_open()) {
-    	return Blob();
+    	return false;
 	}
     // get length of file:
     file.seekg(0, std::ios::end);
@@ -39,14 +38,14 @@ Blob load_from_file(const char* path)
     file.seekg(0, std::ios::beg);
 
     // allocate memory:
-    blob.allocate(length);
+    dest.allocate(length);
 
     // read data as a block:
-    file.read(blob.range<char>().pointer(),
-    		  blob.bytes().size());
+    file.read(dest.range<char>().pointer(),
+    		  dest.bytes().size());
     file.close();
 
-    return blob;
+    return true;
 }
 
 } // io

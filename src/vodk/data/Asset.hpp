@@ -44,10 +44,10 @@ public:
         return AssetConnectionIterator(_it.next(), _isInput);
     }
     Asset& operator*();
-    AssetConnectionIterator(const kiwi::LinkIterator& it, bool isInput)
+    AssetConnectionIterator(const kiwi::FilterLinkRange& it, bool isInput)
     : _it(it), _isInput(isInput) {}
 private:
-    kiwi::LinkIterator _it;
+    kiwi::FilterLinkRange _it;
     bool _isInput;
 };
 
@@ -76,10 +76,10 @@ public:
     }
 
     AssetConnectionIterator dependencies() {
-        return AssetConnectionIterator(inputConnections(), false);
+        return AssetConnectionIterator(input_connections(kiwi::Node::NO_FILTER), false);
     }
     AssetConnectionIterator dependent_assets() {
-        return AssetConnectionIterator(outputConnections(), true);
+        return AssetConnectionIterator(output_connections(kiwi::Node::NO_FILTER), true);
     }
 
     bool add_dependency(Asset* dep, int port = 0) {

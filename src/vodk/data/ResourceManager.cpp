@@ -17,59 +17,56 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+#include "vodk/data/ResourceManager.hpp"
 #include "vodk/core/Blob.hpp"
+#include <vector>
 
 namespace vodk {
+namespace data {
 
-struct BlobMetaData {
-    uint32_t size;
-    uint32_t type;
-    uint32_t offset;
+
+class IntResource : public Resource {
+public:
+    virtual uint32_t type() const override { return 1; }
+    int32_t value;
 };
 
-static BlobMetaData* _md(void* buf) {
-    return static_cast<BlobMetaData*>(buf);
+template<> struct ResourceTrait<IntResource> { enum { Type = 1 }; };
+
+template<uint32_t N>
+class IntResourceVector : public ResourceVector {
+public:
+
+    virtual Resource* get(ResourceOffset offset, kiwi::PortIndex port) {
+        return &_data[offset][port];
+    }
+
+    virtual void add_offset(ResourceOffset offset) override {
+        if (offset >= _data.size()) {
+            _data.resize(offset+1);
+        }
+    }
+private:
+    std::vector<Array<IntResource,N> > _data;
+};
+
+class AddNode : public ResourceNode {
+public:
+    virtual ResourceVector* create_vector() override {
+        return new IntResourceVector<1>();
+    }
+    virtual void update(Range<Resource*> inputs, Range<Resource*> outputs) {
+        outputs[0]->cast<IntResource>()->value
+            = inputs[0]->cast<IntResource>()->value
+            + inputs[1]->cast<IntResource>()->value;
+    }
+};
+
+namespace unittest {
+    void ResourceManager() {
+        //ResourceManager mgr;
+    }
 }
 
-static uint8_t* _data(void* buf) {
-    return static_cast<uint8_t*>(buf) + static_cast<BlobMetaData*>(buf)->offset;
-}
-
-uint8_t* Blob::data() {
-    return _data(_buffer);
-}
-
-ByteRange Blob::bytes()
-{
-    return ByteRange(_data(_buffer), _md(_buffer)->size);
-}
-
-Range<const uint8_t> Blob::const_bytes() const
-{
-    return Range<const uint8_t>(_data(_buffer), _md(_buffer)->size);
-}
-
-uint32_t Blob::size() const
-{
-    return _md(_buffer)->size;
-}
-
-uint32_t Blob::type() const
-{
-    return _md(_buffer)->type;
-}
-
-
-bool Blob::allocate(uint32_t size, uint32_t type) {
-    _buffer = new uint8_t[size + sizeof(BlobMetaData)];
-    _md(_buffer)->size = size;
-    _md(_buffer)->type = type;
-    _md(_buffer)->offset = sizeof(BlobMetaData);
-    return true;
-}
-
-void Blob::deallocate() {
-    delete (uint8_t*)_buffer;
-}
-
+} // data
 } // vodk

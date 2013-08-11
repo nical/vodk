@@ -121,10 +121,9 @@ bool ShaderAsset::load()
     StringAsset* str_asset = cast_asset<StringAsset>(&*dependencies());
     assert(str_asset);
 
-    Blob src_blob = io::load_from_file(str_asset->get_string().c_str());
-    AutoDeallocateBlob autob(src_blob);
+    Blob src_blob;
 
-    if (src_blob.is_allocated()) {
+    if (io::load_from_file(str_asset->get_string().c_str(), src_blob)) {
         char* src = (char*)src_blob.bytes().pointer();
         int len = src_blob.bytes().size();
         gpu::ShaderSource vs(1, &src, &len);

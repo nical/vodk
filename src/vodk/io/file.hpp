@@ -26,7 +26,7 @@ class Blob;
 
 namespace io {
 
-vodk::Blob load_from_file(const char* path);
+bool load_from_file(const char* path, vodk::Blob& dest);
 
 } // io
 } // vodk

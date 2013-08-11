@@ -22,6 +22,7 @@
 
 #include <stdint.h>
 #include <assert.h>
+#include <vector>
 #include "vodk/core/dump.hpp"
 
 namespace vodk {
@@ -181,26 +182,6 @@ public:
         return InterpolationFunc::compute(a.data, b.data, (t - a.time)/(b.time - a.time));
     }
 };
-
-namespace unittest {
-    void Timeline() {
-        printf("vodk::unittest::Timeline\n");
-        InterpolatedTimeline<float> timeline;
-        timeline.add(1.0, 1.0);
-        timeline.add(2.0, 2.0);
-        timeline.add(4.0, 4.0);
-        timeline.add(3.0, 3.0);
-        timeline.add(7.0, 7.0);
-        timeline.add(0.0, 0.0);
-        timeline.add(6.0, 6.0);
-        debug::dumpln(timeline);
-        for (float f = 0.0; f < 6.1; f += 0.5) {
-            printf("sample %f -> ", f);
-            debug::dumpln(timeline.sample(f));
-            assert(timeline.sample(f) == f);
-        }
-    }
-}
 
 namespace debug {
 

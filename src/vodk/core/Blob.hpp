@@ -25,32 +25,88 @@
 
 namespace vodk {
 
+struct TemporaryBlob {
+	TemporaryBlob(void* buf) : _buffer(buf) {}
+	void* _buffer;
+};
+
 class Blob {
 public:
     Blob() : _buffer(nullptr) {}
 
-    ByteRange bytes();
+    Blob(TemporaryBlob tb) : _buffer(tb._buffer) {}
 
-    template<typename T> Range<T> range() {
-        return Range<T>((T*)bytes().pointer(), size()/sizeof(T));
-    }
+    ~Blob() { deallocate(); }
 
     uint32_t size() const;
+
     uint32_t type() const;
 
     bool is_allocated() const { return !!_buffer; }
 
     bool allocate(uint32_t size, uint32_t type = 0);
+
     void deallocate();
+
+    bool clone_into(Blob& into) const;
+
+    bool copy_into(ByteRange& into) const;
+
+    ByteRange bytes();
+
+    uint8_t* data();
+
+    Range<const uint8_t> const_bytes() const;
+
+    template<typename T> Range<T> range() {
+        return Range<T>((T*)bytes().pointer(), size()/sizeof(T));
+    }
+
+    template<typename T> Range<const T> const_range() {
+        return Range<T>((const T*)bytes().pointer(), size()/sizeof(T));
+    }
+
+    /**
+     * Loose ownership and reference to the data.
+     */
+    TemporaryBlob drop() {
+    	return TemporaryBlob(_buffer);
+    	_buffer = nullptr;
+    }
 
 protected:
     void* _buffer;
 };
 
-struct AutoDeallocateBlob {
-    AutoDeallocateBlob(Blob& b) : blob(&b) {}
-    ~AutoDeallocateBlob() { blob->deallocate(); }
-    Blob* blob;
+class StackBlob : public Blob {
+public:
+    template<typename T>
+    T* push_back(const T& value) {
+        if (_stack_offset + sizeof(T) >= size()) {
+            return nullptr;
+        }
+        T* ptr = static_cast<T*>(data()+ _stack_offset);
+        *ptr = value;
+        _stack_offset += sizeof(T); 
+        return ptr;
+    }
+protected:
+    uint32_t _stack_offset;
+    uint32_t _size;
+};
+
+template<typename T, uint32_t N>
+struct Array {
+    T& operator[](uint32_t offset) {
+        assert(offset < N);
+        return _data[offset];
+    }
+
+    const T& operator[](uint32_t offset) const {
+        assert(offset < N);
+        return _data[offset];
+    }
+    T _data[N];
 };
 
 } // vodk

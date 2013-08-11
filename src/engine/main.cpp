@@ -9,8 +9,10 @@
 #include "vodk/core/Timeline.hpp"
 #include "vodk/gfx/GfxSubSystem.hpp"
 #include "vodk/gfx/ImageSurface.hpp"
+#include "vodk/data/ResourceManager.hpp"
 #include "vodk/core/Scope.hpp"
 #include "vodk/io/file.hpp"
+#include "vodk/gfx/Skeleton2D.hpp"
 
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -18,6 +20,16 @@
 #include <assert.h>
 #include <vector>
 
+
+namespace vodk {
+namespace unittest {
+void FreelistVector();
+void IDLookupVector();
+void Timeline();
+void ast();
+void mat3();
+} // unittest
+} // vodk
 
 namespace vodk {
 namespace gfx {
@@ -59,6 +71,8 @@ bool main_loop() {
 
 int main()
 {
+    vodk::unittest::mat3();
+    vodk::unittest::FreelistVector();
     vodk::unittest::IDLookupVector();
     vodk::unittest::Timeline();
     vodk::unittest::ast();

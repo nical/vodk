@@ -4,16 +4,13 @@
 
 #include <stdint.h>
 #include <vector>
-
-/*
-TODO:
-    * generic way to iterate over a kiwi::Graph
-    * basic Kiwi::TypeSystem
-*/
+#include "vodk/core/Range.hpp"
 
 namespace kiwi {
 
 typedef int8_t PortIndex;
+typedef uint32_t NodeTypeID; /// 0 should always be considered a blank/invalid ID
+typedef uint32_t PortTypeID; /// 0 should always be considered a blank/invalid ID
 class Node;
 class Graph;
 
@@ -22,46 +19,38 @@ enum Direction {
     OUTPUT,
 };
 
-struct Link {
-    Node* outputNode;     // -->
-    Node* inputNode;      // -->
-    PortIndex outputPort; // <--
-    PortIndex inputPort;  // <--
+class TypeSystem {
 
+};
+
+struct Link {
     Link(Node* outNode, Node* inNode, PortIndex outPort, PortIndex inPort)
     : outputNode(outNode), inputNode(inNode)
     , outputPort(outPort), inputPort(inPort)
     {}
+
+    Node* outputNode;     // -->
+    Node* inputNode;      // -->
+    PortIndex outputPort; // <--
+    PortIndex inputPort;  // <--
 };
 
-class LinkIterator {
+class FilterLinkRange {
 public:
-    LinkIterator(Link** start, Link** end, PortIndex inFilter, PortIndex outFilter)
+    FilterLinkRange(Link** start, Link** end, PortIndex inFilter, PortIndex outFilter)
     : _start(start), _end(end), _inIndex(inFilter), _outIndex(outFilter)
     {}
-    bool empty() {
-        return _start >= _end;
-    }
-    LinkIterator next() {
-        Link** i = _start;
-        while (i != _end) {
-            ++i;
-            if ((_inIndex < 0 || _inIndex == (*i)->inputPort) &&
-                (_outIndex < 0 || _outIndex == (*i)->outputPort)) {
-                break;
-            }
-        }
-        return LinkIterator(i, _end, _inIndex, _outIndex);
-    }
-    const Link* get_link() {
-        return *_start;
-    }
-    const Link& operator*() {
-        return **_start;
-    }
-    const Link* operator->() {
-        return *_start;
-    }
+
+    FilterLinkRange next();
+
+    bool empty() { return _start >= _end; }
+
+    const Link* get_link() { return *_start; }
+
+    const Link& operator*() { return **_start; }
+
+    const Link* operator->() { return *_start; }
+
 protected:
     Link** _start;
     Link** _end;
@@ -69,7 +58,7 @@ protected:
     PortIndex _outIndex;
 };
 
-class ConnectedNodeIterator : public LinkIterator
+class ConnectedNodeIterator : public FilterLinkRange
 {
 public:
     const Node* get_node() {
@@ -79,72 +68,85 @@ public:
         }
         return nullptr;
     }
-    const Node& operator*() {
-        return *get_node();
-    }
-    const Node* operator->() {
-        return get_node();
-    }
+
+    const Node& operator*() { return *get_node(); }
+ 
+    const Node* operator->() { return get_node(); }
+
 protected:
     kiwi::Direction _direction;
 };
 
-typedef uint32_t NodeTypeID; /// 0 should always be considered a blank/invalid ID
-typedef uint32_t PortTypeID; /// 0 should always be considered a blank/invalid ID
-
 class Node {
 public:
-    friend class kiwi::Graph;
+    typedef Range<Link*> LinkRange;
+    static const int NO_FILTER = -1;
 
     Node(Graph* graph, NodeTypeID type = 0)
     : _graph(graph), _typeID(type) {}
-    virtual ~Node() {}
 
-    static const int NO_FILTER = -1;
-
-    LinkIterator inputConnections(PortIndex filter = NO_FILTER) {
-        if (_inputs.size() == 0) return LinkIterator(nullptr, nullptr, NO_FILTER, NO_FILTER);
-        return LinkIterator(&_inputs[0], &_inputs[_inputs.size()-1], filter, NO_FILTER);
-    }
-    LinkIterator outputConnections(PortIndex filter = NO_FILTER) {
-        if (_outputs.size() == 0) return LinkIterator(nullptr, nullptr, NO_FILTER, NO_FILTER);
-        return LinkIterator(&_outputs[0], &_outputs[_outputs.size()-1], NO_FILTER, filter);
+    LinkRange input_connections() {
+        return LinkRange(_inputs.data(), _inputs.size());
     }
 
-    PortIndex num_inputs() { return _inputs.size(); }
-    PortIndex num_outputs() { return _outputs.size(); }
-    virtual PortTypeID get_input_typeid(PortIndex) { return 0; }
-    virtual PortTypeID get_output_typeid(PortIndex) { return 0; }
+    LinkRange output_connections() {
+        return LinkRange(_outputs.data(), _outputs.size());
+    }
+
+    FilterLinkRange input_connections(PortIndex filter);
+
+    FilterLinkRange output_connections(PortIndex filter);
 
     NodeTypeID get_typeid() const { return _typeID; }
 
     Graph* get_graph() { return _graph; }
 
-private:
     std::vector<Link*> _inputs;
     std::vector<Link*> _outputs;
     Graph*             _graph;
     NodeTypeID         _typeID;
 };
 
-class INodeIterator {
-public:
-    virtual ~INodeIterator() {}
-    virtual Node& get() = 0;
-    virtual bool next() = 0;
+struct PortDescriptor {
+    std::vector<PortTypeID> inputs;
+    std::vector<PortTypeID> outputs;
 };
 
-class Graph {
+class Graph : public Node {
 public:
-    virtual bool connect(Node& n1, PortIndex p1,
-                        Node& n2, PortIndex p2);
-    virtual bool are_connected(Node& n1, PortIndex p1,
-                             Node& n2, PortIndex p2);
+    Graph() : Node(nullptr) {}
+
+    virtual bool connect(Node& n1, PortIndex p1, Node& n2, PortIndex p2);
+
     virtual bool disconnect(const Link* l);
 
-    //virtual INodeIterator* nodes() = 0;
+    virtual bool are_connected(Node& n1, PortIndex p1, Node& n2, PortIndex p2);
 };
 
-} // namespace
+class BasicGraph : public Graph {
+public:
+    typedef Node** Iterator;
+
+    Node* create_node(NodeTypeID node_type);
+
+    void delete_node(Node* n);
+
+    Range<Node*> nodes() { return Range<Node*>(_nodes.data(), _nodes.size()); }
+
+protected:
+    std::vector<Node*> _nodes;
+};
+
+namespace base {
+
+bool connect(Node& n1, PortIndex p1, Node& n2, PortIndex p2);
+
+bool disconnect(const Link* l);
+
+bool are_connected(Node& n1, PortIndex p1, Node& n2, PortIndex p2);
+
+} // base
+
+} // kiwi
 
 #endif
