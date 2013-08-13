@@ -24,7 +24,6 @@
 namespace vodk {
 namespace data {
 
-
 class IntResource : public Resource {
 public:
     virtual uint32_t type() const override { return 1; }

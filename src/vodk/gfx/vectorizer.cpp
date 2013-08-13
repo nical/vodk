@@ -63,6 +63,8 @@ bool vectorize(ImageSurface* input, std::vector<glm::vec2>& output) {
 
     printf("vecotrize: %i %i\n", ix, iy);
 
+    output.push_back(glm::vec2(ix, iy));
+
     return false;
 }
 
