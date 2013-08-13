@@ -4,8 +4,6 @@ Import('widget')
 print ' -- ' + build_target
 
 cpp_flags = ' -std=c++0x -g '
-gtk_cpp_flags = ' `pkg-config gtkmm-3.0 clutter-gtkmm-1.0 --cflags` '
-gtk_link_flags = ' `pkg-config gtkmm-3.0 clutter-gtkmm-1.0 --libs` '
 
 include_dir = [Dir('../../src')]
 libs = ['png']
@@ -32,8 +30,7 @@ if widget == 'Emscripten':
     env.Replace(CPPPATH = include_dir + [Dir('/usr/include')])
 
 if widget != 'Emscripten':
-	env.Append(CPPFLAGS = gtk_cpp_flags)
-	env.Append(LINKFLAGS = gtk_link_flags)
+	env.ParseConfig('pkg-config --cflags --libs cairomm-1.0 gtkmm-3.0 clutter-gtkmm-1.0')
 	env.Program('vectorizer-gtk', vodk_src + gtk_tools_src + vectorizer_gtk_main)
 	env.Program('clutter-test', vodk_src + gtk_tools_src + clutter_test_main)
 
