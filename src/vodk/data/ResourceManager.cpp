@@ -25,43 +25,6 @@ namespace vodk {
 namespace data {
 
 
-class IntResource : public Resource {
-public:
-    virtual uint32_t type() const override { return 1; }
-    int32_t value;
-};
-
-template<> struct ResourceTrait<IntResource> { enum { Type = 1 }; };
-
-template<uint32_t N>
-class IntResourceVector : public ResourceVector {
-public:
-
-    virtual Resource* get(ResourceOffset offset, kiwi::PortIndex port) {
-        return &_data[offset][port];
-    }
-
-    virtual void add_offset(ResourceOffset offset) override {
-        if (offset >= _data.size()) {
-            _data.resize(offset+1);
-        }
-    }
-private:
-    std::vector<Array<IntResource,N> > _data;
-};
-
-class AddNode : public ResourceNode {
-public:
-    virtual ResourceVector* create_vector() override {
-        return new IntResourceVector<1>();
-    }
-    virtual void update(Range<Resource*> inputs, Range<Resource*> outputs) {
-        outputs[0]->cast<IntResource>()->value
-            = inputs[0]->cast<IntResource>()->value
-            + inputs[1]->cast<IntResource>()->value;
-    }
-};
-
 namespace unittest {
     void ResourceManager() {
         //ResourceManager mgr;

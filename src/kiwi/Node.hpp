@@ -9,6 +9,7 @@
 namespace kiwi {
 
 typedef int8_t PortIndex;
+typedef uint32_t NodeID; /// 0 should always be considered a blank/invalid ID
 typedef uint32_t NodeTypeID; /// 0 should always be considered a blank/invalid ID
 typedef uint32_t PortTypeID; /// 0 should always be considered a blank/invalid ID
 class Node;
@@ -35,6 +36,8 @@ struct Link {
     PortIndex inputPort;  // <--
 };
 
+typedef Range<Link*> LinkRange;
+
 class FilterLinkRange {
 public:
     FilterLinkRange(Link** start, Link** end, PortIndex inFilter, PortIndex outFilter)
@@ -58,6 +61,70 @@ protected:
     PortIndex _outIndex;
 };
 
+class FilteredInputConnectionRange {
+public:
+    FilteredInputConnectionRange(LinkRange range, PortIndex input)
+    : _range(range), _input(input) {}
+
+    bool empty() { return _range.empty(); }
+
+    const Link* get() { return *_range.pointer(); }
+
+    const Link& operator*() { return *get(); }
+
+    const Link* operator->() { return get(); }
+
+    FilteredInputConnectionRange next() {
+        auto r = *this;
+        while (!r.empty()) {
+            if (r.get()->inputPort == _input) {
+                break;
+            }
+        }
+        return r;
+    }
+
+protected:
+    LinkRange _range;
+    PortIndex _input;
+};
+
+template<typename T>
+class PreviousNodeRange {
+public:
+
+    PreviousNodeRange(T range)
+    : _range(range) {}
+
+    bool empty() { return _range.empty(); }
+
+    const Link* get() { return _range->outputNode(); }
+
+    const Link& operator*() { return *get(); }
+
+    const Link* operator->() { return get(); }
+protected:
+    T _range;
+};
+
+template<typename T>
+class NextNodeRange {
+public:
+
+    NextNodeRange(T range)
+    : _range(range) {}
+
+    bool empty() { return _range.empty(); }
+
+    const Link* get() { return _range->inputNode(); }
+
+    const Link& operator*() { return *get(); }
+
+    const Link* operator->() { return get(); }
+protected:
+    T _range;
+};
+
 class ConnectedNodeIterator : public FilterLinkRange
 {
 public:
@@ -79,7 +146,6 @@ protected:
 
 class Node {
 public:
-    typedef Range<Link*> LinkRange;
     static const int NO_FILTER = -1;
 
     Node(Graph* graph, NodeTypeID type = 0)
@@ -96,6 +162,10 @@ public:
     FilterLinkRange input_connections(PortIndex filter);
 
     FilterLinkRange output_connections(PortIndex filter);
+
+    ConnectedNodeIterator previous_nodes(PortIndex filter);
+
+    ConnectedNodeIterator next_nodes(PortIndex filter);
 
     NodeTypeID get_typeid() const { return _typeID; }
 
@@ -135,7 +205,9 @@ public:
 
 protected:
     std::vector<Node*> _nodes;
+    Node* _internal_node;
 };
+
 
 namespace base {
 

@@ -112,5 +112,8 @@ void BasicGraph::delete_node(Node* n) {
     delete n;
 }
 
+void text_nodes() {
+    BasicGraph graph;
+}
 
 } // namespace

@@ -3,31 +3,15 @@
 #define KIWI_GRAPH_HPP
 
 #include <vector>
+#include <limits>
+#include "vodk/core/Range.hpp"
 
 namespace kiwi2 {
 
+typedef uint32_t NodeTypeID;
 typedef uint16_t NodeID;
+typedef uint16_t LinkID;
 typedef uint8_t PortID;
-
-enum ConnectionState {
-	KIWI_DISCONNECTED,
-	KIWI_CONNECTED,
-}
-
-struct Link {
-	NodeID node;
-	PortID port;
-	ConnectionState state;
-};
-
-struct Node {
-	std::vector<Connection> _input_connections
-	std::vector<Connection> _output_connections
-};
-
-class Graph {
-
-};
 
 
 

@@ -36,7 +36,7 @@ public:
     typedef T* iterator;
     typedef const T* const_iterator;
 
-    Range(T* s, T* e) : _start(s), _end(e) {}
+    Range(T* s = nullptr, T* e = nullptr) : _start(s), _end(e) {}
     Range(T* aStart, uint32_t aSize) : _start(aStart), _end(aStart+aSize) {}
 
     T& operator[](uint32_t i) {
@@ -67,7 +67,7 @@ public:
         return _start;
     }
 
-    bool operator==(Range rhs) {
+    bool operator==(Range rhs) const {
         return _start == rhs._start && _end == rhs._end;
     }
 
@@ -101,7 +101,7 @@ public:
 
     Self next() const {
         Self s = *this;
-        s.shrink_left();
+        s.shrink_left(1);
         return s;
     }
 

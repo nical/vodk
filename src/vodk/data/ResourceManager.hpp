@@ -55,6 +55,7 @@ struct ResourceTrait {
     enum { Type = RESOURCE_TYPE_UNKNOWN };
 };
 
+/*
 class Resource {
 public:
     virtual uint32_t type() const = 0;
@@ -65,18 +66,22 @@ public:
         return nullptr;
     }
 };
+*/
 
 class ResourceVector {
 public:
     virtual ~ResourceVector() {}
-    virtual Resource* get(ResourceOffset offset, kiwi::PortIndex port);
+    virtual void* get(ResourceOffset offset, kiwi::PortIndex port);
+    template<typename T> T* get_and_cast(ResourceOffset offset, kiwi::PortIndex port) {
+        return static_cast<T*>(get(offset, port));
+    }
     virtual void add_offset(ResourceOffset offset) = 0;
 };
 
 class ResourceNode : public kiwi::Node {
 public:
     virtual ResourceVector* create_vector() = 0;
-    virtual void update(Range<Resource*> inputs, Range<Resource*> outputs) = 0;
+    virtual void update(Range<void*> inputs, Range<void*> outputs) = 0;
 };
 
 class ResourceGraph : public kiwi::Graph {

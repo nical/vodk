@@ -20,6 +20,11 @@
 #include <assert.h>
 #include <vector>
 
+namespace kiwi2 {
+namespace unittest {
+void graph_test();
+}
+}
 
 namespace vodk {
 namespace unittest {
@@ -71,6 +76,7 @@ bool main_loop() {
 
 int main()
 {
+    kiwi2::unittest::graph_test();
     vodk::unittest::mat3();
     vodk::unittest::FreelistVector();
     vodk::unittest::IDLookupVector();

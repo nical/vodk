@@ -21,6 +21,7 @@
 #define VODK_CORE_FREELISTVECTOR_HPP
 
 #include <vector>
+#include <limits>
 #include "vodk/core/Range.hpp"
 
 namespace vodk {
@@ -29,29 +30,52 @@ template<typename T>
 class FreelistVector {
 public:
     typedef uint32_t Offset;
-    static const Offset FREELIST_EMPTY = 0;
+    struct Slot {
+        Slot() {}
+        Slot(const T& init) {
+            new(&padding[0]) T();
+            cast() = init;
+        }
+        T& cast() { return *reinterpret_cast<T*>(this); }
+        const T& cast() const { return *reinterpret_cast<const T*>(this); }
+        Offset& as_freelist() {
+            return *reinterpret_cast<Offset*>(this);
+        }
+        uint8_t padding[sizeof(T)];
+    };
+
+    static const Offset FREELIST_EMPTY = std::numeric_limits<Offset>::max();
+
+    FreelistVector()
+    : _free_list(FREELIST_EMPTY)
+    {}
 
     T& operator[](Offset o) {
-        return _data[o];
+        return _data[o].cast();
     }
 
     const T& operator[](Offset o) const {
-        return _data[o];
+        return _data[o].cast();
     }
 
     Offset add(const T& val) {
-        if (_free_cells.size() > 0) {
-            Offset result = _free_cells[_free_cells.size()-1];
-            _free_cells.pop_back();
-            _data[result] = val;
-            return result;
+        if (_free_list != FREELIST_EMPTY) {
+            Offset index = _free_list;
+            _free_list = _data[_free_list].as_freelist();
+            _data[index] = val;
+            return index;
         }
+
         _data.push_back(val);
         return _data.size() - 1;
     }
 
     void remove(Offset o) {
-        _free_cells.push_back(o);
+        _data[o].cast().~T();
+        if (_free_list != FREELIST_EMPTY) {
+            _data[o].as_freelist() = _free_list;
+            _free_list = o;
+        }
     }
 
     Offset push_back(const T& val) {
@@ -77,12 +101,11 @@ public:
 
     void clear() {
         _data.clear();
-        _free_cells.clear();
     }
 
 private:
-    std::vector<T> _data;
-    std::vector<uint32_t> _free_cells;
+    std::vector<Slot> _data;
+    Offset _free_list;
 };
 
 } // vodk
