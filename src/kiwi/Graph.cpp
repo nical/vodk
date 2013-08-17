@@ -13,9 +13,6 @@ struct Link {
     PortID port_2; // <--
 };
 
-typedef Range<LinkID> ConnectionRange;
-typedef std::vector<LinkID> ConnectionVector;
-
 struct Node {
     Node(NodeTypeID id = 0) : type_id(id) {}
     ConnectionVector input_connections;
@@ -23,261 +20,189 @@ struct Node {
     NodeTypeID type_id;
 };
 
-class NodeIterator {
-public:
-    explicit NodeIterator(Range<Node*> r, NodeID id = 0)
-    : _range(r), _id(id) {}
-
-    NodeID get() const { return _id; }
-
-    NodeID operator*() const { return get(); }
-
-    NodeIterator operator++() {
-        if (!_range.empty()) {
-            _range = _range.next();
-        }
-        // skip zeros
-        while (!_range.empty() && _range[0] == nullptr) {
-            _range = _range.next();
-            ++_id;
-        }
-        return *this;
-    }
-
-    NodeIterator operator++(int) {
-        NodeIterator n = *this;
-        ++(*this);
-        return n;
-    }
-
-protected:
-    Range<Node*> _range;
-    NodeID _id;
-    friend bool operator==(const NodeIterator& lhs, const NodeIterator& rhs);
-};
-
-bool operator==(const NodeIterator& lhs, const NodeIterator& rhs) {
-    return lhs._range == rhs._range;
+Graph::Graph()
+: _num_nodes(1) {
+    _nodes.push_back(new Node(0));
 }
 
-bool operator!=(const NodeIterator& lhs, const NodeIterator& rhs) {
-    return !(lhs == rhs);
+Graph::~Graph() {
+    for (auto& n : _nodes) {
+        delete n;
+    }
+    for (auto& l : _connections) {
+        delete l;
+    }
 }
 
-
-class NodeRange {
-public:
-    NodeRange(Range<Node*> range) : _range(range) {}
-
-    NodeIterator begin() { return NodeIterator(_range); }
-
-    NodeIterator end() {
-        return NodeIterator(Range<Node*>(_range.pointer() + _range.size(),
-                                         _range.pointer() + _range.size()));
-    }
-protected:
-    Range<Node*> _range;
-};
-
-class Graph {
-public:
-    static const NodeID INVALID_NODE_ID = std::numeric_limits<NodeID>::max();
-
-    Graph() : _num_nodes(1) {
-        _nodes.push_back(new Node(0));
-    }
-
-    virtual ~Graph() {
-        for (auto& n : _nodes) {
-            delete n;
-        }
-        for (auto& l : _connections) {
-            delete l;
+NodeID Graph::add_node(NodeTypeID type) {
+    NodeID result = INVALID_NODE_ID;
+    ++ _num_nodes;
+    for (NodeID i = 0; i < _nodes.size(); ++i) {
+        if (!_nodes[i]) {
+            _nodes[i] = new Node(type);
+            return i;
         }
     }
+    _nodes.push_back(new Node(type));
+    return _nodes.size()-1;
+}
 
-    NodeID add_node(NodeTypeID type) {
-        NodeID result = INVALID_NODE_ID;
-        ++ _num_nodes;
-        for (NodeID i = 0; i < _nodes.size(); ++i) {
-            if (!_nodes[i]) {
-                _nodes[i] = new Node(type);
-                return i;
+void Graph::remove_node(NodeID n) {
+    assert(_nodes[n]);
+    assert(n != 0);
+    --_num_nodes;
+    // TODO
+}
+
+bool Graph::are_connected(NodeID n1, NodeID n2) {
+    return false; // TODO
+}
+
+NodeTypeID Graph::get_node_type(NodeID n) {
+    assert(n < _nodes.size());
+    assert(_nodes[n]);
+    return _nodes[n]->type_id;
+}
+
+LinkID Graph::connect(NodeID n1, PortID p1, NodeID n2, PortID p2) {
+    // connections are stored in order of increasing port
+    auto it1 = _nodes[n1]->output_connections.begin();
+    auto stop1 = _nodes[n1]->output_connections.end();
+    while (it1 != stop1 && link(*it1)->port_1 < p1) { ++it1; }
+
+    auto it2 = _nodes[n2]->input_connections.begin();
+    auto stop2 = _nodes[n2]->input_connections.end();
+    while (it2 != stop2 && link(*it2)->port_2 < p2) { ++it2; }
+
+    Link* l = new Link(n1,p1,n2,p2);
+
+    int result = -1;
+    for (int i = 0; i < _connections.size(); ++i) {
+        if (!_connections[i]) {
+            _connections[i] = l;
+            result = i;
+            break;
+        }
+    }
+    if (result < 0) {
+        _connections.push_back(l);
+        result = _connections.size() - 1;     
+    }
+    _nodes[n1]->output_connections.insert(it1, result);
+    _nodes[n2]->input_connections.insert(it2, result);
+    return result;
+}
+
+void Graph::disconnect(LinkID l) {
+    Node& n1 = *_nodes[link(l)->node_1];
+    Node& n2 = *_nodes[link(l)->node_2];
+
+    auto it1 = n1.output_connections.begin();
+    auto stop1 = n1.output_connections.end();
+    while (it1 != stop1) {
+        if (*it1 == l) {
+            n1.output_connections.erase(it1);
+        }
+        ++it1;
+    }
+    auto it2 = n2.input_connections.begin();
+    auto stop2 = n2.input_connections.end();
+    while (it2 != stop2) {
+        if (*it2 == l) {
+            n2.input_connections.erase(it2);
+        }
+        ++it2;
+    }
+    delete _connections[l];
+    _connections[l] = nullptr;
+}
+
+void Graph::disconnect_inputs(NodeID n, PortID p) {
+    while (input_connections(n, p).size() > 0) {
+        disconnect(input_connections(n, p)[0]);
+    }
+}
+
+void Graph::disconnect_outputs(NodeID n, PortID p) {
+    while (output_connections(n, p).size() > 0) {
+        disconnect(output_connections(n, p)[0]);
+    }
+}
+
+void Graph::disconnect_all_inputs(NodeID n) {
+    while (input_connections(n).size() > 0) {
+        disconnect(input_connections(n)[0]);
+    }
+}
+
+void Graph::disconnect_all_outputs(NodeID n) {
+    while (output_connections(n).size() > 0) {
+        disconnect(output_connections(n)[0]);
+    }
+}
+
+ConnectionRange Graph::input_connections(NodeID n) {
+    ConnectionVector& cv = _nodes[n]->input_connections;
+    return ConnectionRange(cv.data(), cv.size());
+}
+
+ConnectionRange Graph::output_connections(NodeID n) {
+    ConnectionVector& cv = _nodes[n]->output_connections;
+    return ConnectionRange(cv.data(), cv.size());
+}
+
+ConnectionRange Graph::output_connections(NodeID n, PortID output_port) {
+    ConnectionVector& connections = _nodes[n]->output_connections;
+    for(int i = 0; i < connections.size(); ++i) {
+        if (link(connections[i])->port_1 == output_port) {
+            int j = i;
+            while (j < connections.size()
+                   && link(connections[j])->port_1 == output_port) {
+                ++j;
             }
+            return ConnectionRange(&connections[i], j-i);
         }
-        _nodes.push_back(new Node(type));
-        return _nodes.size()-1;
     }
+    return ConnectionRange();
+}
 
-    NodeID internal_node() {
-        return 0;
-    }
-
-    void remove_node(NodeID n) {
-        assert(_nodes[n]);
-        assert(n != 0);
-        --_num_nodes;
-        // TODO
-    }
-
-    bool are_connected(NodeID n1, NodeID n2) {
-        return false; // TODO
-    }
-
-    NodeTypeID get_node_type(NodeID n) {
-        assert(n < _nodes.size());
-        assert(_nodes[n]);
-        return _nodes[n]->type_id;
-    }
-
-    LinkID connect(NodeID n1, PortID p1, NodeID n2, PortID p2) {
-        // connections are stored in order of increasing port
-        auto it1 = _nodes[n1]->output_connections.begin();
-        auto stop1 = _nodes[n1]->output_connections.end();
-        while (it1 != stop1 && link(*it1)->port_1 < p1) { ++it1; }
-
-        auto it2 = _nodes[n2]->input_connections.begin();
-        auto stop2 = _nodes[n2]->input_connections.end();
-        while (it2 != stop2 && link(*it2)->port_2 < p2) { ++it2; }
-
-        Link* l = new Link(n1,p1,n2,p2);
-
-        int result = -1;
-        for (int i = 0; i < _connections.size(); ++i) {
-            if (!_connections[i]) {
-                _connections[i] = l;
-                result = i;
-                break;
+ConnectionRange Graph::input_connections(NodeID n, PortID input_port) {
+    ConnectionVector& connections = _nodes[n]->input_connections;
+    for(int i = 0; i < connections.size(); ++i) {
+        if (link(connections[i])->port_2 == input_port) {
+            int j = i;
+            while (j < connections.size()
+                   && link(connections[j])->port_2 == input_port) {
+                ++j;
             }
-        }
-        if (result < 0) {
-            _connections.push_back(l);
-            result = _connections.size() - 1;     
-        }
-        _nodes[n1]->output_connections.insert(it1, result);
-        _nodes[n2]->input_connections.insert(it2, result);
-        return result;
-    }
-
-    void disconnect(LinkID l) {
-        Node& n1 = *_nodes[link(l)->node_1];
-        Node& n2 = *_nodes[link(l)->node_2];
-
-        auto it1 = n1.output_connections.begin();
-        auto stop1 = n1.output_connections.end();
-        while (it1 != stop1) {
-            if (*it1 == l) {
-                n1.output_connections.erase(it1);
-            }
-            ++it1;
-        }
-        auto it2 = n2.input_connections.begin();
-        auto stop2 = n2.input_connections.end();
-        while (it2 != stop2) {
-            if (*it2 == l) {
-                n2.input_connections.erase(it2);
-            }
-            ++it2;
-        }
-        delete _connections[l];
-        _connections[l] = nullptr;
-    }
-
-    void disconnect_inputs(NodeID n, PortID p) {
-        while (input_connections(n, p).size() > 0) {
-            disconnect(input_connections(n, p)[0]);
+            return ConnectionRange(&connections[i], j-i);
         }
     }
+    return ConnectionRange();
+}
 
-    void disconnect_outputs(NodeID n, PortID p) {
-        while (output_connections(n, p).size() > 0) {
-            disconnect(output_connections(n, p)[0]);
-        }
+NodeID Graph::node_before(LinkID l) {
+    assert(l < _connections.size());
+    return _connections[l]->node_1;
+}
+
+NodeID Graph::node_after(LinkID l) {
+    assert(l < _connections.size());
+    return _connections[l]->node_2;
+}
+
+NodeRange Graph::nodes() {
+    return NodeRange(Range<Node*>(_nodes.data(), _nodes.size()));
+}
+
+uint16_t Graph::num_connections() {
+    uint16_t count = 0;
+    for (auto c : _connections) {
+        if (c != nullptr) { ++count; }
     }
+    return count;
+}
 
-    void disconnect_all_inputs(NodeID n) {
-        while (input_connections(n).size() > 0) {
-            disconnect(input_connections(n)[0]);
-        }
-    }
-
-    void disconnect_all_outputs(NodeID n) {
-        while (output_connections(n).size() > 0) {
-            disconnect(output_connections(n)[0]);
-        }
-    }
-
-    ConnectionRange input_connections(NodeID n) {
-        ConnectionVector& cv = _nodes[n]->input_connections;
-        return ConnectionRange(cv.data(), cv.size());
-    }
-
-    ConnectionRange output_connections(NodeID n) {
-        ConnectionVector& cv = _nodes[n]->output_connections;
-        return ConnectionRange(cv.data(), cv.size());
-    }
-
-    ConnectionRange output_connections(NodeID n, PortID output_port) {
-        ConnectionVector& connections = _nodes[n]->output_connections;
-        for(int i = 0; i < connections.size(); ++i) {
-            if (link(connections[i])->port_1 == output_port) {
-                int j = i;
-                while (j < connections.size()
-                       && link(connections[j])->port_1 == output_port) {
-                    ++j;
-                }
-                return ConnectionRange(&connections[i], j-i);
-            }
-        }
-        return ConnectionRange();
-    }
-
-    ConnectionRange input_connections(NodeID n, PortID input_port) {
-        ConnectionVector& connections = _nodes[n]->input_connections;
-        for(int i = 0; i < connections.size(); ++i) {
-            if (link(connections[i])->port_2 == input_port) {
-                int j = i;
-                while (j < connections.size()
-                       && link(connections[j])->port_2 == input_port) {
-                    ++j;
-                }
-                return ConnectionRange(&connections[i], j-i);
-            }
-        }
-        return ConnectionRange();
-    }
-
-    NodeID node_before(LinkID l) {
-        assert(l < _connections.size());
-        return _connections[l]->node_1;
-    }
-
-    NodeID node_after(LinkID l) {
-        assert(l < _connections.size());
-        return _connections[l]->node_2;
-    }
-
-    NodeRange nodes() {
-        return NodeRange(Range<Node*>(_nodes.data(), _nodes.size()));
-    }
-
-    uint16_t num_nodes() { return _num_nodes; }
-
-    uint16_t num_connections() {
-        uint16_t count = 0;
-        for (auto c : _connections) {
-            if (c != nullptr) { ++count; }
-        }
-        return count;
-    }
-
-protected:
-    Link* link(LinkID id) { return _connections[id]; }
-
-    std::vector<Node*> _nodes;
-    std::vector<Link*> _connections;
-    uint16_t _num_nodes;
-};
 
 namespace unittest {
 
