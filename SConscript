@@ -31,13 +31,11 @@ if widget == 'Emscripten':
     env.Replace(CPPPATH = include_dir + [Dir('/usr/include')])
 
 if widget != 'Emscripten':
-	#env.ParseConfig('pkg-config --cflags --libs cairomm-1.0 gtkmm-3.0 clutter-gtkmm-1.0')
-	env.ParseConfig('pkg-config --cflags --libs cairomm-1.0 gtkmm-3.0')
+	env.ParseConfig('pkg-config --cflags --libs cairomm-1.0 gtkmm-3.0 clutter-gtkmm-1.0')
+	#env.ParseConfig('pkg-config --cflags --libs cairomm-1.0 gtkmm-3.0')
 	env.Program('vectorizer-gtk', vodk_src + gtk_tools_src + vectorizer_gtk_main)
-	#env.Program('clutter-test', vodk_src + gtk_tools_src + clutter_test_main)
+	env.Program('clutter-test', vodk_src + gtk_tools_src + clutter_test_main)
 	env.Program('kiwi-gtk', vodk_src + gtk_tools_src + kiwi_gtk_main)
-
-#env.Append(LIBPATH = ['/usr/local/lib/'])
 
 libs += gl3_libs
 env.Append(LIBS = libs)

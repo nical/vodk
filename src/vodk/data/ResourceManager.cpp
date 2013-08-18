@@ -24,12 +24,5 @@
 namespace vodk {
 namespace data {
 
-
-namespace unittest {
-    void ResourceManager() {
-        //ResourceManager mgr;
-    }
-}
-
 } // data
 } // vodk
