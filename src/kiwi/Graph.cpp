@@ -20,9 +20,11 @@ struct Node {
     NodeTypeID type_id;
 };
 
-Graph::Graph()
-: _num_nodes(1) {
-    _nodes.push_back(new Node(0));
+Graph::Graph(TypeSystem* ts, NodeTypeID self_type)
+: _type_system(ts)
+, _num_nodes(1)
+{
+    _nodes.push_back(new Node(self_type));
 }
 
 Graph::~Graph() {
@@ -35,6 +37,9 @@ Graph::~Graph() {
 }
 
 NodeID Graph::add_node(NodeTypeID type) {
+    if (_type_system && !_type_system->contains_type(type)) {
+        return INVALID_NODE_ID;
+    }
     NodeID result = INVALID_NODE_ID;
     ++ _num_nodes;
     for (NodeID i = 0; i < _nodes.size(); ++i) {
@@ -65,6 +70,10 @@ NodeTypeID Graph::get_node_type(NodeID n) {
 }
 
 LinkID Graph::connect(NodeID n1, PortID p1, NodeID n2, PortID p2) {
+    if (_type_system && !_type_system->can_connect(*this, n1, p1, n2, p2)) {
+        return -1;
+    }
+
     // connections are stored in order of increasing port
     auto it1 = _nodes[n1]->output_connections.begin();
     auto stop1 = _nodes[n1]->output_connections.end();
@@ -94,6 +103,8 @@ LinkID Graph::connect(NodeID n1, PortID p1, NodeID n2, PortID p2) {
 }
 
 void Graph::disconnect(LinkID l) {
+    assert(l >= 0 && l < _connections.size());
+
     Node& n1 = *_nodes[link(l)->node_1];
     Node& n2 = *_nodes[link(l)->node_2];
 
@@ -207,16 +218,76 @@ uint16_t Graph::num_connections() {
 namespace unittest {
 
 void graph_test() {
-    Graph graph;
-    auto n1 = graph.add_node(1);
-    auto n2 = graph.add_node(2);
-    auto n3 = graph.add_node(3);
+    static const int TYPE_INT = 1;
+    static const int TYPE_FLOAT = 2;
+
+    SimpleTypeSystem types;
+
+    auto graph_type = types.register_type({
+        "Graph",
+        {
+            {TYPE_INT, "A"},
+            {TYPE_INT, "B"}
+        },
+        {
+            {TYPE_INT, "R0"},
+            {TYPE_INT, "R1"}
+        }
+    });
+
+    Graph graph(&types, graph_type);
+
+
+    auto t1 = types.register_type({
+        "Bar",
+        {
+            {TYPE_INT, "A"}
+        },
+        {
+            {TYPE_INT, "R0"},
+            {TYPE_INT, "R1"},
+            {TYPE_INT, "R2"},
+            {TYPE_INT, "R3"}
+        }
+    });
+
+    auto t2 = types.register_type({
+        "Baz",
+        {
+            {TYPE_INT, "A"},
+            {TYPE_INT, "B"},
+            {TYPE_INT, "C"},
+            {TYPE_INT, "D"}
+        },
+        {
+            {TYPE_INT, "R"},
+        }
+    });
+
+    auto t3 = types.register_type({
+        "Foo",
+        {
+            {TYPE_FLOAT, "A"},
+            {TYPE_FLOAT, "B"}
+        },
+        {
+            {TYPE_FLOAT, "R"},
+        }
+    });
+
+    assert(t1 != t2);
+    assert(t1 != t3);
+    assert(t2 != t3);
+
+    auto n1 = graph.add_node(t1);
+    auto n2 = graph.add_node(t2);
+    auto n3 = graph.add_node(t3);
 
     assert(graph.num_connections() == 0);
 
-    assert(graph.get_node_type(n1) == 1);
-    assert(graph.get_node_type(n2) == 2);
-    assert(graph.get_node_type(n3) == 3);
+    assert(graph.get_node_type(n1) == t1);
+    assert(graph.get_node_type(n2) == t2);
+    assert(graph.get_node_type(n3) == t3);
 
     for (int i = 0; i < 10; ++i) {
         assert(graph.output_connections(n1, i).size() == 0);
